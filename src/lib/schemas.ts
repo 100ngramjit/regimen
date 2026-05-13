@@ -83,6 +83,7 @@ export const WeeklyPlanRequestSchema = z.object({
 
 export type WeeklyPlanRequest = z.infer<typeof WeeklyPlanRequestSchema>;
 export type DayPlanConfig = z.infer<typeof DayPlanConfigSchema>;
+export type FitnessLevel = WeeklyPlanRequest["level"];
 
 export const DayWorkoutSchema = z.object({
   day: z.string(),

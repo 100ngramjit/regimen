@@ -50,13 +50,21 @@ type Mode = "single" | "weekly";
 
 export default function Home() {
   const [mode, setMode] = useLocalStorage<Mode>("ff-mode", "weekly");
-  const [workout, setWorkout] = useLocalStorage<Workout | null>("ff-last-workout", null);
-  const [weeklyPlan, setWeeklyPlan] = useLocalStorage<WeeklyPlan | null>("ff-last-weekly", null);
+  const [workout, setWorkout] = useLocalStorage<Workout | null>(
+    "ff-last-workout",
+    null,
+  );
+  const [weeklyPlan, setWeeklyPlan] = useLocalStorage<WeeklyPlan | null>(
+    "ff-last-weekly",
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [lastSingleReq, setLastSingleReq] = useLocalStorage<WorkoutRequest | null>("ff-last-single-req", null);
-  const [lastWeeklyReq, setLastWeeklyReq] = useLocalStorage<WeeklyPlanRequest | null>("ff-last-weekly-req", null);
+  const [lastSingleReq, setLastSingleReq] =
+    useLocalStorage<WorkoutRequest | null>("ff-last-single-req", null);
+  const [lastWeeklyReq, setLastWeeklyReq] =
+    useLocalStorage<WeeklyPlanRequest | null>("ff-last-weekly-req", null);
 
   useEffect(() => {
     if (!toast) return;
@@ -74,6 +82,16 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      if (res.status === 429) {
+        throw new Error("Too many requests. Please wait a moment before forging again.");
+      }
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("The server returned an invalid response. Please try again later.");
+      }
+
       const result = await res.json();
       if (!res.ok)
         throw new Error(result.error || "Failed to generate workout");
@@ -102,6 +120,16 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      if (res.status === 429) {
+        throw new Error("Rate limit exceeded. Give the AI a minute to rest!");
+      }
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Invalid server response format.");
+      }
+
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Failed to generate plan");
       setWeeklyPlan(result);
@@ -134,10 +162,14 @@ export default function Home() {
       downloadFile(
         weeklyPlanToText(weeklyPlan),
         "fitforge-weekly-plan.txt",
-        "text/plain"
+        "text/plain",
       );
     else if (mode === "single" && workout)
-      downloadFile(workoutToText(workout), "fitforge-workout.txt", "text/plain");
+      downloadFile(
+        workoutToText(workout),
+        "fitforge-workout.txt",
+        "text/plain",
+      );
   };
 
   const handleExportHtml = () => {
@@ -145,18 +177,19 @@ export default function Home() {
       downloadFile(
         weeklyPlanToHtml(weeklyPlan),
         "fitforge-weekly-plan.html",
-        "text/html"
+        "text/html",
       );
     else if (mode === "single" && workout)
-      downloadFile(workoutToHtml(workout), "fitforge-workout.html", "text/html");
+      downloadFile(
+        workoutToHtml(workout),
+        "fitforge-workout.html",
+        "text/html",
+      );
   };
 
   const handleExportPdf = () => {
     if (mode === "weekly" && weeklyPlan)
-      downloadPdf(
-        weeklyPlanToHtml(weeklyPlan),
-        "fitforge-weekly-plan.pdf"
-      );
+      downloadPdf(weeklyPlanToHtml(weeklyPlan), "fitforge-weekly-plan.pdf");
     else if (mode === "single" && workout)
       downloadPdf(workoutToHtml(workout), "fitforge-workout.pdf");
   };
@@ -197,9 +230,10 @@ export default function Home() {
             </motion.div>
 
             <h1 className="mb-6 text-6xl font-black leading-tight tracking-tight sm:text-8xl">
-              Forge Your <br />
+              Precision Fitness
+              <br />
               <AnimatedShinyText shimmerWidth={350}>
-                Peak Performance
+                zero bullshit
               </AnimatedShinyText>
             </h1>
 

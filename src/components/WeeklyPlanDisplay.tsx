@@ -360,15 +360,7 @@ export default function WeeklyPlanDisplay({
         ))}
       </div>
 
-      <div className="pt-8">
-        <Button className="w-full h-16 rounded-2xl text-base font-black tracking-[0.3em] uppercase transition-all shadow-2xl hover:scale-[1.01] active:scale-[0.99] group bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
-          <CheckCircle2
-            size={24}
-            className="mr-3 group-hover:scale-110 transition-transform"
-          />
-          Initialize Training Cycle
-        </Button>
-      </div>
+
     </motion.div>
   );
 }

@@ -7,6 +7,7 @@ import {
   DayOfWeek,
   DayFocus,
   WeeklyPlanRequest,
+  FitnessLevel,
 } from "@/lib/schemas";
 import {
   Calendar,
@@ -54,7 +55,7 @@ const DEFAULT_SCHEDULE: DayPlanConfig[] = [
 
 export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
   const [goal, setGoal] = useLocalStorage("ff-week-goal", "muscle gain");
-  const [level, setLevel] = useLocalStorage<"beginner" | "intermediate" | "advanced">("ff-week-level", "intermediate");
+  const [level, setLevel] = useLocalStorage<FitnessLevel>("ff-week-level", "intermediate");
   const [equipment, setEquipment] = useLocalStorage("ff-week-equipment", "full gym");
   const [notes, setNotes] = useLocalStorage("ff-week-notes", "");
   const [schedule, setSchedule] = useLocalStorage<DayPlanConfig[]>("ff-week-schedule", DEFAULT_SCHEDULE);
@@ -158,7 +159,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             {schedule.map((d) => (
               <div
                 key={d.day}
@@ -194,8 +195,8 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
                         setFocus(d.day as DayOfWeek, v as DayFocus)
                       }
                     >
-                      <SelectTrigger className="h-9 text-xs font-bold uppercase px-2 border-none bg-background/50">
-                        <SelectValue />
+                      <SelectTrigger className="h-9 text-xs font-bold uppercase px-2 border border-primary/20 bg-background/80 text-primary hover:bg-background transition-all">
+                        <SelectValue placeholder={d.focus} />
                       </SelectTrigger>
                       <SelectContent>
                         {DAY_FOCUS_OPTIONS.filter((f) => f !== "Rest").map(
@@ -203,7 +204,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
                             <SelectItem
                               key={f}
                               value={f}
-                              className="text-[11px] font-medium uppercase"
+                              className="text-xs font-bold uppercase"
                             >
                               {f}
                             </SelectItem>
@@ -270,7 +271,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
             <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
               <Zap size={16} className="text-primary" /> Level
             </Label>
-            <Select value={level} onValueChange={(v) => setLevel(v as any)}>
+            <Select value={level} onValueChange={(v: FitnessLevel) => setLevel(v)}>
               <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">
                 <SelectValue />
               </SelectTrigger>

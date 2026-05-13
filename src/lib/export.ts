@@ -1,6 +1,7 @@
 import { WeeklyPlan, Workout } from './schemas';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import pako from 'pako';
 
 // ── Markdown export ─────────────────────────────────────────────────────────
 
@@ -120,21 +121,21 @@ const S = {
   subtitle:  `color:${C.fgMuted};font-size:14px;margin:0 0 36px;`,
 
   // Section divider — table-based, no pseudo elements
-  divWrap:   `display:table;width:100%;margin:32px 0 16px;border-collapse:collapse;`,
+  divWrap:   `display:table;width:100%;margin:32px 0 16px;border-collapse:collapse;break-inside:avoid;`,
   divLine:   `display:table-cell;border-top:1px solid ${C.border};vertical-align:middle;width:50%;`,
   divLabel:  `display:table-cell;padding:0 14px;white-space:nowrap;font-size:10px;font-weight:900;letter-spacing:0.25em;text-transform:uppercase;color:${C.fgMuted};border:1px solid ${C.border};border-radius:999px;background:${C.muted};vertical-align:middle;text-align:center;`,
 
   // Exercise card — table layout for reliable two-column split
-  exCard:    `background:${C.card};border:1px solid ${C.border};border-radius:14px;margin-bottom:10px;overflow:hidden;`,
+  exCard:    `background:${C.card};border:1px solid ${C.border};border-radius:14px;margin-bottom:10px;overflow:hidden;break-inside:avoid;`,
   exTable:   `display:table;width:100%;border-collapse:collapse;padding:18px 20px;`,
   exLeft:    `display:table-cell;vertical-align:top;width:100%;`,
   exRight:   `display:table-cell;vertical-align:middle;white-space:nowrap;padding-left:16px;text-align:right;`,
 
   // Number badge
   numBadge:  `display:inline-block;width:30px;height:30px;border-radius:8px;background:${C.primary};color:${C.numBadgeFg};font-size:12px;font-weight:900;border:1px solid ${C.primaryBdr};text-align:center;line-height:30px;vertical-align:top;flex-shrink:0;`,
-  exNameWrap:`display:inline-block;vertical-align:top;padding-left:12px;`,
+  exNameWrap:`display:inline-block;vertical-align:top;padding-left:12px;max-width:calc(100% - 40px);`,
   exName:    `font-size:16px;font-weight:800;color:${C.fg};letter-spacing:-0.02em;line-height:1.3;`,
-  exNote:    `font-size:12px;color:${C.fgMuted};font-style:italic;margin-top:3px;`,
+  exNote:    `font-size:12px;color:${C.fgMuted};font-style:italic;margin-top:3px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;`,
 
   // Badges (right column)
   badgeSets: `display:inline-block;padding:4px 9px;border-radius:7px;font-size:10px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;border:1px solid ${C.border};background:${C.muted};color:${C.fg};white-space:nowrap;`,
@@ -143,7 +144,7 @@ const S = {
   restIcon:  `color:${C.primary};`,
 
   // Day card
-  dayCard:   `border:1px solid ${C.border};border-radius:16px;overflow:hidden;margin-bottom:14px;background:${C.card};`,
+  dayCard:   `border:1px solid ${C.border};border-radius:16px;overflow:hidden;margin-bottom:14px;background:${C.card};break-inside:avoid;`,
   dayHeader: `display:table;width:100%;border-collapse:collapse;padding:16px 20px;border-bottom:1px solid ${C.border};box-sizing:border-box;`,
   dayLeft:   `display:table-cell;vertical-align:middle;`,
   dayName:   `display:inline-block;font-size:11px;font-weight:900;letter-spacing:0.18em;text-transform:uppercase;color:${C.fgMuted};min-width:80px;vertical-align:middle;`,
@@ -299,9 +300,6 @@ export function weeklyPlanToHtml(plan: WeeklyPlan): string {
 </html>`;
 }
 
-
-
-
 export function downloadFile(content: string, filename: string, type: string) {
   const blob = new Blob([content], { type: `${type};charset=utf-8` });
   const url = URL.createObjectURL(blob);
@@ -340,12 +338,19 @@ export async function downloadPdf(html: string, filename: string) {
   doc.close();
 
   // Wait for Google Fonts + layout
-  await new Promise(resolve => setTimeout(resolve, 1600));
+  try {
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      await (doc as any).fonts.ready;
+    }
+  } catch (e) {
+    console.warn('Font loading check failed, falling back to timeout');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
 
   // Expand iframe to full content height so html2canvas captures everything
   const totalContentH = doc.documentElement.scrollHeight;
   iframe.style.height = totalContentH + 'px';
-  await new Promise(resolve => setTimeout(resolve, 120));
+  await new Promise(resolve => setTimeout(resolve, 200));
 
   try {
     // Capture the whole page as one canvas at 2× scale
@@ -404,17 +409,91 @@ export async function downloadPdf(html: string, filename: string) {
 
 // ── Shareable link ────────────────────────────────────────────────────────────
 
+const KEY_MAP: Record<string, string> = {
+  weekTitle: 'wt',
+  goal: 'g',
+  days: 'ds',
+  day: 'd',
+  focus: 'f',
+  isRest: 'r',
+  workout: 'w',
+  title: 't',
+  totalTime: 'tt',
+  sections: 's',
+  name: 'n',
+  exercises: 'e',
+  sets: 'st',
+  duration: 'dr',
+  reps: 'rp',
+  rest: 'rs',
+  instructions: 'i',
+};
+
+const REV_MAP = Object.fromEntries(Object.entries(KEY_MAP).map(([k, v]) => [v, k]));
+
+function compact(obj: any): any {
+  if (Array.isArray(obj)) return obj.map(compact);
+  if (obj !== null && typeof obj === 'object') {
+    const out: any = {};
+    for (const k in obj) {
+      const newK = KEY_MAP[k] || k;
+      out[newK] = compact(obj[k]);
+    }
+    return out;
+  }
+  return obj;
+}
+
+function expand(obj: any): any {
+  if (Array.isArray(obj)) return obj.map(expand);
+  if (obj !== null && typeof obj === 'object') {
+    const out: any = {};
+    for (const k in obj) {
+      const newK = REV_MAP[k] || k;
+      out[newK] = expand(obj[k]);
+    }
+    return out;
+  }
+  return obj;
+}
+
 export function encodeSharePayload(data: WeeklyPlan | Workout): string {
-  const json = JSON.stringify(data);
-  const encoded = btoa(encodeURIComponent(json));
-  return encoded;
+  // 1. Compact the object by mapping keys
+  const compacted = compact(data);
+  const json = JSON.stringify(compacted);
+  
+  // 2. Use deflate (smaller than gzip as it lacks headers)
+  const compressed = pako.deflate(json);
+  
+  // 3. Convert to URL-safe Base64
+  const base64 = btoa(String.fromCharCode(...Array.from(compressed)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+    
+  return base64;
 }
 
 export function decodeSharePayload<T>(encoded: string): T | null {
   try {
-    const json = decodeURIComponent(atob(encoded));
-    return JSON.parse(json) as T;
-  } catch {
+    // 1. Restore standard Base64 padding and characters
+    let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    
+    // 2. Inflate and parse
+    const json = pako.inflate(bytes, { to: 'string' });
+    const compacted = JSON.parse(json);
+    
+    // 3. Expand keys back to original names
+    return expand(compacted) as T;
+  } catch (e) {
+    console.error('Failed to decode share payload:', e);
     return null;
   }
 }
