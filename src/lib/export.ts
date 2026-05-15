@@ -340,9 +340,9 @@ export async function downloadPdf(html: string, filename: string) {
   // Wait for Google Fonts + layout
   try {
     if (typeof document !== 'undefined' && 'fonts' in document) {
-      await (doc as any).fonts.ready;
+      await (doc as Document & { fonts?: FontFaceSet }).fonts?.ready;
     }
-  } catch (e) {
+  } catch {
     console.warn('Font loading check failed, falling back to timeout');
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
@@ -431,10 +431,12 @@ const KEY_MAP: Record<string, string> = {
 
 const REV_MAP = Object.fromEntries(Object.entries(KEY_MAP).map(([k, v]) => [v, k]));
 
-function compact(obj: any): any {
+type ShareValue = null | string | number | boolean | ShareValue[] | { [key: string]: ShareValue };
+
+function compact(obj: ShareValue): ShareValue {
   if (Array.isArray(obj)) return obj.map(compact);
   if (obj !== null && typeof obj === 'object') {
-    const out: any = {};
+    const out: Record<string, ShareValue> = {};
     for (const k in obj) {
       const newK = KEY_MAP[k] || k;
       out[newK] = compact(obj[k]);
@@ -444,10 +446,10 @@ function compact(obj: any): any {
   return obj;
 }
 
-function expand(obj: any): any {
+function expand(obj: ShareValue): ShareValue {
   if (Array.isArray(obj)) return obj.map(expand);
   if (obj !== null && typeof obj === 'object') {
-    const out: any = {};
+    const out: Record<string, ShareValue> = {};
     for (const k in obj) {
       const newK = REV_MAP[k] || k;
       out[newK] = expand(obj[k]);
@@ -459,7 +461,7 @@ function expand(obj: any): any {
 
 export function encodeSharePayload(data: WeeklyPlan | Workout): string {
   // 1. Compact the object by mapping keys
-  const compacted = compact(data);
+  const compacted = compact(data as ShareValue);
   const json = JSON.stringify(compacted);
   
   // 2. Use deflate (smaller than gzip as it lacks headers)

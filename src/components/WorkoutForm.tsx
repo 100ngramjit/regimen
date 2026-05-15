@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { WorkoutRequest } from "@/lib/schemas";
+import { FitnessLevel, WorkoutRequest } from "@/lib/schemas";
 import {
   Sparkles,
   Dumbbell,
@@ -135,7 +135,7 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
               <Select
                 value={formData.level}
                 onValueChange={(v) =>
-                  setFormData({ ...formData, level: v as any })
+                  setFormData({ ...formData, level: v as FitnessLevel })
                 }
               >
                 <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">

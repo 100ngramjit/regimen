@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useMemo } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { WeeklyPlan, Workout } from '@/lib/schemas';
 import { 
@@ -17,21 +18,15 @@ import {
 } from '@/lib/export';
 import WorkoutDisplay from '@/components/WorkoutDisplay';
 import WeeklyPlanDisplay from '@/components/WeeklyPlanDisplay';
-import { Suspense } from 'react';
 
 function SharedContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get('type');
   const planEncoded = searchParams.get('plan');
 
-  const [plan, setPlan] = useState<WeeklyPlan | Workout | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (!planEncoded) { setError(true); return; }
-    const decoded = decodeSharePayload<WeeklyPlan | Workout>(planEncoded);
-    if (!decoded) { setError(true); return; }
-    setPlan(decoded);
+  const plan = useMemo(() => {
+    if (!planEncoded) return null;
+    return decodeSharePayload<WeeklyPlan | Workout>(planEncoded);
   }, [planEncoded]);
 
   const handleExportMd = () => {
@@ -64,22 +59,16 @@ function SharedContent() {
     await copyToClipboard(url);
   };
 
-  if (error || !planEncoded) {
+  if (!planEncoded || !plan) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
-        <h2 className="text-2xl font-black text-porcelain-100">Invalid or expired link</h2>
-        <p className="mt-2 text-porcelain-500">This workout plan link is invalid or couldn't be decoded.</p>
-        <a href="/" className="mt-6 rounded-xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 hover:-translate-y-0.5">
-          ← Back to Regimen
-        </a>
-      </div>
-    );
-  }
-
-  if (!plan) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
+        <h2 className="text-2xl font-black">Invalid or expired link</h2>
+        <p className="mt-2 text-muted-foreground">
+          This workout plan link is invalid or could not be decoded.
+        </p>
+        <Link href="/" className="mt-6 rounded-lg bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90">
+          Back to Regimen
+        </Link>
       </div>
     );
   }
@@ -88,14 +77,14 @@ function SharedContent() {
     <div className="min-h-screen bg-background pb-20">
       <div className="sticky top-16 z-40 border-b border-border/20 bg-muted/10 py-3 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6">
-          <span className="text-xs font-black uppercase tracking-widest text-primary">👀 Shared Workout Plan</span>
+          <span className="text-xs font-black uppercase tracking-widest text-primary">Shared Workout Plan</span>
           <div className="flex gap-3">
             <button onClick={handleExportMd} className="rounded-lg border border-border/30 bg-background/50 px-4 py-2 text-xs font-black uppercase tracking-widest text-foreground/80 transition-all hover:bg-primary hover:text-primary-foreground">
-              ↓ Export MD
+              Export MD
             </button>
-            <a href="/" className="rounded-lg bg-primary px-4 py-2 text-xs font-black uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90">
-              Create Your Own →
-            </a>
+            <Link href="/" className="rounded-lg bg-primary px-4 py-2 text-xs font-black uppercase tracking-widest text-primary-foreground transition-all hover:bg-primary/90">
+              Create Your Own
+            </Link>
           </div>
         </div>
       </div>

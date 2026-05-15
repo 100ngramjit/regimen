@@ -202,8 +202,6 @@ export async function POST(req: NextRequest) {
       generationConfig: { responseMimeType: "application/json" }
     });
 
-    const activeDays = validatedData.schedule.filter(d => !d.isRest);
-
     const prompt = `You are a certified personal trainer. Generate a complete weekly workout plan.
 
 User Details:

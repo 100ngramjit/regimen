@@ -5,26 +5,14 @@ import { Workout } from "@/lib/schemas";
 import {
   Clock,
   CheckCircle2,
-  RotateCcw,
   TrendingUp,
   TrendingDown,
-  Download,
-  Share2,
-  FileText,
-  FileCode,
-  Type,
-  FileDown,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import PlanActions from "@/components/PlanActions";
 
 interface Props {
   workout: Workout;
@@ -86,66 +74,14 @@ export default function WorkoutDisplay({
             </Button>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 gap-2 font-bold uppercase tracking-widest text-xs border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
-              >
-                <Download size={16} /> Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 p-2 rounded-xl border-primary/20 bg-card/95 backdrop-blur-md"
-            >
-              <DropdownMenuItem
-                onClick={onExportMd}
-                className="flex items-center gap-3 rounded-lg py-2.5 font-medium cursor-pointer"
-              >
-                <FileText size={16} className="text-primary" /> Markdown (.md)
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onExportTxt}
-                className="flex items-center gap-3 rounded-lg py-2.5 font-medium cursor-pointer"
-              >
-                <Type size={16} className="text-secondary" /> Plain Text (.txt)
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onExportHtml}
-                className="flex items-center gap-3 rounded-lg py-2.5 font-medium cursor-pointer"
-              >
-                <FileCode size={16} className="text-accent" /> HTML Document
-                (.html)
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onExportPdf}
-                className="flex items-center gap-3 rounded-lg py-2.5 font-medium cursor-pointer"
-              >
-                <FileDown size={16} className="text-destructive" /> PDF Document
-                (.pdf)
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onShare}
-            className="h-10 gap-2 font-bold uppercase tracking-widest text-xs border-secondary/20 bg-secondary/5 hover:bg-secondary/10 transition-all"
-          >
-            <Share2 size={16} /> Share
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRegenerate}
-            className="h-10 gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/50"
-          >
-            <RotateCcw size={16} /> Rebuild
-          </Button>
+          <PlanActions
+            onRegenerate={onRegenerate}
+            onExportMd={onExportMd}
+            onExportTxt={onExportTxt}
+            onExportHtml={onExportHtml}
+            onExportPdf={onExportPdf}
+            onShare={onShare}
+          />
         </div>
       </div>
 

@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import { Dumbbell } from "lucide-react";
+import { CalendarDays, Dumbbell, Zap } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
-import { withAuth, signOut } from '@workos-inc/authkit-nextjs';
+import { withAuth } from '@workos-inc/authkit-nextjs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import { handleSignOut } from '@/lib/actions';
 
 export default async function Header() {
   const { user } = await withAuth();
@@ -30,14 +28,18 @@ export default async function Header() {
           </span>
         </Link>
         {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-6 mr-auto ml-8">
-          <Link href="#" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
-            Workouts
-          </Link>
-          <Link href="#" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
-            Programs
-          </Link>
-        </nav>
+        {user && (
+          <nav className="hidden md:flex items-center gap-6 mr-auto ml-8">
+            <Link href="/weekly" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
+              <CalendarDays size={13} />
+              Weekly
+            </Link>
+            <Link href="/session" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
+              <Zap size={13} />
+              Session
+            </Link>
+          </nav>
+        )}
 
         {/* Global Actions */}
         <div className="flex items-center gap-3 sm:gap-6">
@@ -66,11 +68,21 @@ export default async function Header() {
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/50" />
-                <DropdownMenuItem className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary">
-                  Dashboard
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/weekly"
+                    className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
+                  >
+                    Weekly planner
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary">
-                  Settings
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/session"
+                    className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
+                  >
+                    Single session
+                  </Link>
                 </DropdownMenuItem>
                 <div className="sm:hidden">
                    <DropdownMenuSeparator className="bg-border/50" />
