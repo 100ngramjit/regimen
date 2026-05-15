@@ -1,13 +1,12 @@
 "use client";
 
 import {
+  Code2,
   Download,
-  FileCode,
   FileDown,
+  FileSpreadsheet,
   FileText,
   RotateCcw,
-  Share2,
-  Type,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,79 +15,66 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  ExportFormat,
+  ExportPlan,
+  exportPlan,
+} from "@/lib/workout-export";
 
 interface PlanActionsProps {
-  onExportMd: () => void;
-  onExportTxt: () => void;
-  onExportHtml: () => void;
-  onExportPdf?: () => void;
-  onShare: () => void;
   onRegenerate?: () => void;
   canRegenerate?: boolean;
+  exportData?: ExportPlan;
 }
 
+const EXPORT_OPTIONS: {
+  format: ExportFormat;
+  label: string;
+  icon: typeof FileText;
+}[] = [
+  { format: "sheets", label: "Sheets", icon: FileSpreadsheet },
+  { format: "md", label: "Markdown", icon: FileText },
+  { format: "html", label: "HTML", icon: Code2 },
+  { format: "pdf", label: "PDF", icon: FileDown },
+];
+
 export default function PlanActions({
-  onExportMd,
-  onExportTxt,
-  onExportHtml,
-  onExportPdf,
-  onShare,
   onRegenerate,
   canRegenerate = true,
+  exportData,
 }: PlanActionsProps) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-10 gap-2 rounded-lg border-primary/20 bg-primary/5 text-xs font-bold uppercase tracking-widest transition-all hover:bg-primary/10"
-          >
-            <Download size={16} /> Export
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="w-48 rounded-lg border-primary/20 bg-card/95 p-2 backdrop-blur-md"
-        >
-          <DropdownMenuItem
-            onClick={onExportMd}
-            className="flex cursor-pointer items-center gap-3 rounded-md py-2.5 font-medium"
-          >
-            <FileText size={16} className="text-primary" /> Markdown
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={onExportTxt}
-            className="flex cursor-pointer items-center gap-3 rounded-md py-2.5 font-medium"
-          >
-            <Type size={16} className="text-secondary" /> Plain text
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={onExportHtml}
-            className="flex cursor-pointer items-center gap-3 rounded-md py-2.5 font-medium"
-          >
-            <FileCode size={16} className="text-accent" /> HTML
-          </DropdownMenuItem>
-          {onExportPdf && (
-            <DropdownMenuItem
-              onClick={onExportPdf}
-              className="flex cursor-pointer items-center gap-3 rounded-md py-2.5 font-medium"
+      {exportData && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-10 gap-2 rounded-lg text-xs font-bold uppercase tracking-widest"
             >
-              <FileDown size={16} className="text-destructive" /> PDF
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              <Download size={16} />
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center" className="min-w-44">
+            {EXPORT_OPTIONS.map((option) => {
+              const Icon = option.icon;
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onShare}
-        className="h-10 gap-2 rounded-lg border-secondary/20 bg-secondary/5 text-xs font-bold uppercase tracking-widest transition-all hover:bg-secondary/10"
-      >
-        <Share2 size={16} /> Share
-      </Button>
+              return (
+                <DropdownMenuItem
+                  key={option.format}
+                  className="gap-2 text-xs font-bold uppercase tracking-wider"
+                  onSelect={() => exportPlan(exportData, option.format)}
+                >
+                  <Icon size={15} />
+                  {option.label}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       {onRegenerate && (
         <Button

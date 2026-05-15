@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useDbState } from "@/lib/use-db-state";
 import WorkoutForm from "@/components/WorkoutForm";
@@ -14,24 +14,9 @@ import {
   WeeklyPlanRequest,
 } from "@/lib/schemas";
 import {
-  weeklyPlanToMarkdown,
-  workoutToMarkdown,
-  weeklyPlanToText,
-  workoutToText,
-  weeklyPlanToHtml,
-  workoutToHtml,
-  downloadMarkdown,
-  downloadFile,
-  buildShareUrl,
-  copyToClipboard,
-  downloadPdf,
-} from "@/lib/export";
-import {
   Zap,
   CalendarDays,
-  CheckCircle2,
   Clock3,
-  FileDown,
   Hammer,
 } from "lucide-react";
 import {
@@ -75,18 +60,19 @@ const MODE_LINKS: {
 ];
 
 export default function HomeClient({ mode }: HomeClientProps) {
-  const [workout, setWorkout] = useDbState<Workout | null>(
+  const [workout, setWorkout, isLoadingWorkout] = useDbState<Workout | null>(
     "ff-last-workout",
     null,
   );
-  const [weeklyPlan, setWeeklyPlan] = useDbState<WeeklyPlan | null>(
+  const [weeklyPlan, setWeeklyPlan, isLoadingWeekly] = useDbState<WeeklyPlan | null>(
     "ff-last-weekly",
     null,
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [usage, setUsage] = useState<{ count: number; limit: number; remaining: number } | null>(null);
+  const [isLoadingUsage, setIsLoadingUsage] = useState(true);
   const [reforgeMode, setReforgeMode] = useState<PlannerMode | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const [lastSingleReq, setLastSingleReq] = useDbState<WorkoutRequest | null>(
     "ff-last-single-req",
     null,
@@ -94,11 +80,24 @@ export default function HomeClient({ mode }: HomeClientProps) {
   const [, setLastWeeklyReq] =
     useDbState<WeeklyPlanRequest | null>("ff-last-weekly-req", null);
 
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 2800);
-    return () => clearTimeout(t);
-  }, [toast]);
+  const fetchUsage = async () => {
+    try {
+      const res = await fetch("/api/usage");
+      if (res.ok) {
+        const data = await res.json();
+        setUsage(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch usage:", e);
+    } finally {
+      setIsLoadingUsage(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchUsage();
+  }, []);
+
 
   const generateWorkout = async (data: WorkoutRequest) => {
     setIsLoading(true);
@@ -128,6 +127,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
       if (!res.ok)
         throw new Error(result.error || "Failed to generate workout");
       setWorkout(result);
+      fetchUsage();
       setReforgeMode(null);
       setTimeout(
         () =>
@@ -166,6 +166,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Failed to generate plan");
       setWeeklyPlan(result);
+      fetchUsage();
       setReforgeMode(null);
       setTimeout(
         () =>
@@ -181,52 +182,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
     }
   };
 
-  const handleExportMd = () => {
-    if (mode === "weekly" && weeklyPlan)
-      downloadMarkdown(
-        weeklyPlanToMarkdown(weeklyPlan),
-        "regimen-weekly-plan.md",
-      );
-    else if (mode === "single" && workout)
-      downloadMarkdown(workoutToMarkdown(workout), "regimen-workout.md");
-  };
-
-  const handleExportTxt = () => {
-    if (mode === "weekly" && weeklyPlan)
-      downloadFile(
-        weeklyPlanToText(weeklyPlan),
-        "regimen-weekly-plan.txt",
-        "text/plain",
-      );
-    else if (mode === "single" && workout)
-      downloadFile(workoutToText(workout), "regimen-workout.txt", "text/plain");
-  };
-
-  const handleExportHtml = () => {
-    if (mode === "weekly" && weeklyPlan)
-      downloadFile(
-        weeklyPlanToHtml(weeklyPlan),
-        "regimen-weekly-plan.html",
-        "text/html",
-      );
-    else if (mode === "single" && workout)
-      downloadFile(workoutToHtml(workout), "regimen-workout.html", "text/html");
-  };
-
-  const handleExportPdf = () => {
-    if (mode === "weekly" && weeklyPlan)
-      downloadPdf(weeklyPlanToHtml(weeklyPlan), "regimen-weekly-plan.pdf");
-    else if (mode === "single" && workout)
-      downloadPdf(workoutToHtml(workout), "regimen-workout.pdf");
-  };
-
-  const handleShare = async () => {
-    const data = mode === "weekly" ? weeklyPlan : workout;
-    if (!data) return;
-    const url = buildShareUrl(data, mode);
-    const ok = await copyToClipboard(url);
-    setToast(ok ? "✓ Link copied to clipboard!" : "Could not copy link.");
-  };
 
   const adjustWorkout = (type: "harder" | "easier") => {
     if (!lastSingleReq) return;
@@ -247,8 +202,9 @@ export default function HomeClient({ mode }: HomeClientProps) {
     );
   };
 
+  const isInitialLoading = isLoadingWorkout || isLoadingWeekly;
   const showResult =
-    (mode === "weekly" && weeklyPlan) || (mode === "single" && workout);
+    !isInitialLoading && ((mode === "weekly" && weeklyPlan) || (mode === "single" && workout));
   const isReforging = reforgeMode === mode;
   const showForm = !showResult || isReforging;
   const description =
@@ -296,11 +252,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
-                  {showResult ? (
-                    <FileDown size={15} className="text-primary" />
-                  ) : (
-                    <Clock3 size={15} className="text-primary" />
-                  )}
+                  <Clock3 size={15} className="text-primary" />
                   {showResult
                     ? `${resultLabel} ready`
                     : "Your inputs autosave as you go."}
@@ -319,7 +271,68 @@ export default function HomeClient({ mode }: HomeClientProps) {
               </div>
             </div>
 
-            {showForm && (
+            {isInitialLoading ? (
+              <section className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+                <Card className="overflow-hidden border-border/40 bg-card/55 shadow-xl backdrop-blur-sm">
+                  <CardHeader className="pb-6 pt-7 sm:px-8">
+                    <div className="h-10 w-1/3 animate-pulse rounded-lg bg-muted/30" />
+                    <div className="mt-2 h-6 w-2/3 animate-pulse rounded-lg bg-muted/20" />
+                  </CardHeader>
+                  <CardContent className="space-y-6 pb-8 sm:px-8">
+                    <div className="h-32 w-full animate-pulse rounded-xl bg-muted/10" />
+                    <div className="h-32 w-full animate-pulse rounded-xl bg-muted/10" />
+                  </CardContent>
+                </Card>
+                <aside className="space-y-4">
+                  <div className="rounded-lg border border-border/40 bg-muted/20 p-5">
+                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                      <Hammer size={15} className="text-primary animate-spin" />
+                      Scanning database...
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-8 w-3/4 animate-pulse rounded-md bg-primary/10" />
+                      <div className="h-4 w-full animate-pulse rounded-md bg-muted/30" />
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
+                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                      <Zap size={15} className="text-primary" />
+                      Daily Allowance
+                    </div>
+                    {isLoadingUsage ? (
+                      <div className="h-6 w-1/2 animate-pulse rounded-md bg-muted/30" />
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl font-black tracking-tight text-primary">
+                            {usage?.remaining ?? 0}
+                          </span>
+                          <span className="mb-1 text-xs font-bold text-muted-foreground">
+                            OF {usage?.limit ?? 2} LEFT
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${((usage?.remaining ?? 0) / (usage?.limit ?? 2)) * 100}%` }}
+                            className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                      Good prompts
+                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                      Mention injuries, disliked movements, available machines,
+                      target muscles, and how hard you want the session to feel.
+                    </p>
+                  </div>
+                </aside>
+              </section>
+            ) : showForm && (
               <section
                 id="composer"
                 className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start"
@@ -361,21 +374,56 @@ export default function HomeClient({ mode }: HomeClientProps) {
                 <aside className="space-y-4">
                   <div className="rounded-lg border border-border/40 bg-muted/20 p-5">
                     <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      {showResult ? (
-                        <Hammer size={15} className="text-primary" />
-                      ) : (
-                        <FileDown size={15} className="text-primary" />
-                      )}
-                      {showResult ? "Reforge mode" : "Current output"}
+                      <Hammer size={15} className="text-primary" />
+                      {isInitialLoading ? "Scanning database..." : showResult ? "Reforge mode" : "Current output"}
                     </div>
-                    <p className="text-2xl font-black tracking-tight">
-                      {showResult ? "Tune and replace" : "No plan yet"}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {showResult
-                        ? "Update your constraints, generate again, and the new result will replace the current one."
-                        : "Generate once and this panel becomes your launch point for reviewing the result."}
-                    </p>
+                    {isInitialLoading ? (
+                      <div className="space-y-2">
+                        <div className="h-8 w-3/4 animate-pulse rounded-md bg-primary/10" />
+                        <div className="h-4 w-full animate-pulse rounded-md bg-muted/30" />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-black tracking-tight">
+                          {showResult ? "Tune and replace" : "No plan yet"}
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {showResult
+                            ? "Update your constraints, generate again, and the new result will replace the current one."
+                            : "Generate once and this panel becomes your launch point for reviewing the result."}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
+                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                      <Zap size={15} className="text-primary" />
+                      Daily Allowance
+                    </div>
+                    {isLoadingUsage ? (
+                      <div className="h-6 w-1/2 animate-pulse rounded-md bg-muted/30" />
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl font-black tracking-tight text-primary">
+                            {usage?.remaining ?? 0}
+                          </span>
+                          <span className="mb-1 text-xs font-bold text-muted-foreground">
+                            OF {usage?.limit ?? 2} LEFT
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${((usage?.remaining ?? 0) / (usage?.limit ?? 2)) * 100}%` }}
+                            className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]"
+                          />
+                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                          Resets at midnight
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div className="rounded-lg border border-border/40 bg-card/35 p-5">
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
@@ -425,22 +473,12 @@ export default function HomeClient({ mode }: HomeClientProps) {
                       <WeeklyPlanDisplay
                         plan={weeklyPlan}
                         onRegenerate={beginReforge}
-                        onExportMd={handleExportMd}
-                        onExportTxt={handleExportTxt}
-                        onExportHtml={handleExportHtml}
-                        onExportPdf={handleExportPdf}
-                        onShare={handleShare}
                       />
                     ) : mode === "single" && workout ? (
                       <WorkoutDisplay
                         workout={workout}
                         onRegenerate={beginReforge}
                         onAdjust={adjustWorkout}
-                        onExportMd={handleExportMd}
-                        onExportTxt={handleExportTxt}
-                        onExportHtml={handleExportHtml}
-                        onExportPdf={handleExportPdf}
-                        onShare={handleShare}
                       />
                     ) : null}
                   </CardContent>
@@ -451,20 +489,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
         </div>
       </main>
 
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 50, x: "-50%" }}
-            className="fixed bottom-10 left-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/30 bg-background/80 px-6 py-4 text-sm font-bold text-primary shadow-2xl backdrop-blur-xl"
-          >
-            <CheckCircle2 size={18} className="text-accent" />
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <footer className="mt-auto border-t border-border/40 py-12 sm:py-16 text-center px-6">
         <p className="text-[10px] sm:text-xs font-black tracking-[0.2em] sm:tracking-[0.6em] uppercase text-muted-foreground/60 leading-relaxed">

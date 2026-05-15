@@ -17,11 +17,6 @@ import PlanActions from "@/components/PlanActions";
 interface Props {
   plan: WeeklyPlan;
   onRegenerate: () => void;
-  onExportMd: () => void;
-  onExportTxt: () => void;
-  onExportHtml: () => void;
-  onExportPdf: () => void;
-  onShare: () => void;
 }
 
 const DAY_STYLE = {
@@ -206,11 +201,6 @@ function DayCard({ day }: { day: DayWorkout }) {
 export default function WeeklyPlanDisplay({
   plan,
   onRegenerate,
-  onExportMd,
-  onExportTxt,
-  onExportHtml,
-  onExportPdf,
-  onShare,
 }: Props) {
   const activeDays = plan.days.filter((d) => !d.isRest).length;
 
@@ -234,11 +224,7 @@ export default function WeeklyPlanDisplay({
 
         <PlanActions
           onRegenerate={onRegenerate}
-          onExportMd={onExportMd}
-          onExportTxt={onExportTxt}
-          onExportHtml={onExportHtml}
-          onExportPdf={onExportPdf}
-          onShare={onShare}
+          exportData={{ type: "weekly", plan }}
         />
       </div>
 

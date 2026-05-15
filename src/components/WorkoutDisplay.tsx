@@ -18,22 +18,12 @@ interface Props {
   workout: Workout;
   onRegenerate: () => void;
   onAdjust: (type: "harder" | "easier") => void;
-  onExportMd: () => void;
-  onExportTxt: () => void;
-  onExportHtml: () => void;
-  onExportPdf: () => void;
-  onShare: () => void;
 }
 
 export default function WorkoutDisplay({
   workout,
   onRegenerate,
   onAdjust,
-  onExportMd,
-  onExportTxt,
-  onExportHtml,
-  onExportPdf,
-  onShare,
 }: Props) {
   return (
     <motion.div
@@ -76,11 +66,7 @@ export default function WorkoutDisplay({
 
           <PlanActions
             onRegenerate={onRegenerate}
-            onExportMd={onExportMd}
-            onExportTxt={onExportTxt}
-            onExportHtml={onExportHtml}
-            onExportPdf={onExportPdf}
-            onShare={onShare}
+            exportData={{ type: "single", workout }}
           />
         </div>
       </div>
