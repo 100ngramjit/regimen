@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/Header";
 import "./globals.css";
 
 const alegreyaSans = Alegreya_Sans({
@@ -10,7 +11,7 @@ const alegreyaSans = Alegreya_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "FitForge AI — Build Your Perfect Program",
+  title: "Regimen AI — Precision Training Protocols",
   description: "Generate hyper-personalized AI workout plans and complete weekly training programs. Free, fast, and tailored to your goals.",
 };
 
@@ -28,6 +29,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Header />
           {children}
         </ThemeProvider>
       </body>

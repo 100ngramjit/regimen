@@ -36,7 +36,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useLocalStorage } from "@/lib/use-local-storage";
+import { useDbState } from "@/lib/use-db-state";
 
 interface Props {
   onGenerate: (data: WeeklyPlanRequest) => void;
@@ -54,11 +54,17 @@ const DEFAULT_SCHEDULE: DayPlanConfig[] = [
 ];
 
 export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
-  const [goal, setGoal] = useLocalStorage("ff-week-goal", "muscle gain");
-  const [level, setLevel] = useLocalStorage<FitnessLevel>("ff-week-level", "intermediate");
-  const [equipment, setEquipment] = useLocalStorage("ff-week-equipment", "full gym");
-  const [notes, setNotes] = useLocalStorage("ff-week-notes", "");
-  const [schedule, setSchedule] = useLocalStorage<DayPlanConfig[]>("ff-week-schedule", DEFAULT_SCHEDULE);
+  const [goal, setGoal] = useDbState("ff-week-goal", "muscle gain");
+  const [level, setLevel] = useDbState<FitnessLevel>(
+    "ff-week-level",
+    "intermediate",
+  );
+  const [equipment, setEquipment] = useDbState("ff-week-equipment", "full gym");
+  const [notes, setNotes] = useDbState("ff-week-notes", "");
+  const [schedule, setSchedule] = useDbState<DayPlanConfig[]>(
+    "ff-week-schedule",
+    DEFAULT_SCHEDULE,
+  );
 
   const activeDays = schedule.filter((d) => !d.isRest);
   const daysPerWeek = activeDays.length;
@@ -137,10 +143,12 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
             },
           ].map((s, i) => (
             <Card key={i} className="bg-muted/30 border-border/40 shadow-none">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                <s.icon size={18} className={cn("mb-2 opacity-70", s.color)} />
-                <span className="text-2xl font-black">{s.value}</span>
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <CardContent className="p-3 sm:p-4 flex flex-col items-center justify-center text-center">
+                <s.icon size={16} className={cn("mb-2 opacity-70", s.color)} />
+                <span className="text-xl sm:text-2xl font-black">
+                  {s.value}
+                </span>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {s.label}
                 </p>
               </CardContent>
@@ -159,12 +167,12 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-3">
             {schedule.map((d) => (
               <div
                 key={d.day}
                 className={cn(
-                  "flex flex-col items-center gap-4 rounded-xl border p-3 transition-all duration-200",
+                  "flex flex-col items-center gap-3 sm:gap-4 rounded-xl border p-2 sm:p-3 transition-all duration-200",
                   d.isRest
                     ? "bg-muted/20 border-border/40 opacity-50"
                     : "bg-muted/50 border-primary/20 ring-1 ring-primary/10",
@@ -195,7 +203,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
                         setFocus(d.day as DayOfWeek, v as DayFocus)
                       }
                     >
-                      <SelectTrigger className="h-9 text-xs font-bold uppercase px-2 border border-primary/20 bg-background/80 text-primary hover:bg-background transition-all">
+                      <SelectTrigger className="h-8 sm:h-9 text-[10px] sm:text-xs font-bold uppercase px-1.5 sm:px-2 border border-primary/20 bg-background/80 text-primary hover:bg-background transition-all">
                         <SelectValue placeholder={d.focus} />
                       </SelectTrigger>
                       <SelectContent>
@@ -204,7 +212,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
                             <SelectItem
                               key={f}
                               value={f}
-                              className="text-xs font-bold uppercase"
+                              className="text-[10px] sm:text-xs font-bold uppercase"
                             >
                               {f}
                             </SelectItem>
@@ -271,7 +279,10 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
             <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
               <Zap size={16} className="text-primary" /> Level
             </Label>
-            <Select value={level} onValueChange={(v: FitnessLevel) => setLevel(v)}>
+            <Select
+              value={level}
+              onValueChange={(v: FitnessLevel) => setLevel(v)}
+            >
               <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
@@ -328,7 +339,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
           ) : (
             <div className="flex items-center">
               <Wand2 className="mr-2 h-5 w-5 transition-transform group-hover:rotate-12" />
-              <span>Forge {daysPerWeek}-Day Plan</span>
+              <span>Make {daysPerWeek}-Day Plan</span>
             </div>
           )}
         </Button>

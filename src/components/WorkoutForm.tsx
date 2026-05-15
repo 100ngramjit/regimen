@@ -2,7 +2,14 @@
 
 import React from "react";
 import { WorkoutRequest } from "@/lib/schemas";
-import { Sparkles, Dumbbell, Clock, Activity, Wand2, MessageSquareText } from "lucide-react";
+import {
+  Sparkles,
+  Dumbbell,
+  Clock,
+  Activity,
+  Wand2,
+  MessageSquareText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,8 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
-import { useLocalStorage } from "@/lib/use-local-storage";
+import { useDbState } from "@/lib/use-db-state";
 
 interface Props {
   onGenerate: (data: WorkoutRequest) => void;
@@ -32,12 +38,18 @@ const DEFAULT: WorkoutRequest = {
 };
 
 export default function WorkoutForm({ onGenerate, isLoading }: Props) {
-  const [formData, setFormData] = useLocalStorage<WorkoutRequest>("ff-single-form", DEFAULT);
+  const [formData, setFormData] = useDbState<WorkoutRequest>(
+    "ff-single-form",
+    DEFAULT,
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Guard duration bounds
-    const safe = { ...formData, duration: Math.min(120, Math.max(5, formData.duration ?? 30)) };
+    const safe = {
+      ...formData,
+      duration: Math.min(120, Math.max(5, formData.duration ?? 30)),
+    };
     onGenerate(safe);
   };
 
@@ -50,8 +62,8 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
               <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
                 <Activity size={14} className="text-primary" /> Goal
               </Label>
-              <Select 
-                value={formData.goal} 
+              <Select
+                value={formData.goal}
                 onValueChange={(v) => setFormData({ ...formData, goal: v })}
               >
                 <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">
@@ -75,11 +87,19 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
                 <Input
                   type="number"
                   value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
-                  min={5} max={120}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      duration: parseInt(e.target.value) || 0,
+                    })
+                  }
+                  min={5}
+                  max={120}
                   className="bg-muted/50 border-border/40 pr-12 h-12 text-base"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-bold text-muted-foreground uppercase">min</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-bold text-muted-foreground uppercase">
+                  min
+                </span>
               </div>
             </div>
 
@@ -87,9 +107,11 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
               <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
                 <Dumbbell size={14} className="text-primary" /> Equipment
               </Label>
-              <Select 
-                value={formData.equipment} 
-                onValueChange={(v) => setFormData({ ...formData, equipment: v })}
+              <Select
+                value={formData.equipment}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, equipment: v })
+                }
               >
                 <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">
                   <SelectValue placeholder="Select equipment" />
@@ -99,7 +121,9 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
                   <SelectItem value="dumbbells">Dumbbells Only</SelectItem>
                   <SelectItem value="full gym">Full Gym Access</SelectItem>
                   <SelectItem value="kettlebell">Kettlebells</SelectItem>
-                  <SelectItem value="resistance bands">Resistance Bands</SelectItem>
+                  <SelectItem value="resistance bands">
+                    Resistance Bands
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -108,9 +132,11 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
               <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
                 <Sparkles size={14} className="text-primary" /> Level
               </Label>
-              <Select 
-                value={formData.level} 
-                onValueChange={(v) => setFormData({ ...formData, level: v as any })}
+              <Select
+                value={formData.level}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, level: v as any })
+                }
               >
                 <SelectTrigger className="bg-muted/50 border-border/40 h-12 text-base">
                   <SelectValue placeholder="Select level" />
@@ -126,11 +152,14 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
 
           <div className="space-y-3">
             <Label className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
-              <MessageSquareText size={14} className="text-primary" /> Customization
+              <MessageSquareText size={14} className="text-primary" />{" "}
+              Customization
             </Label>
             <Textarea
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               placeholder="e.g. knee friendly, focus on posterior chain..."
               className="bg-muted/50 border-border/40 min-h-[120px] resize-none focus:bg-background transition-colors text-base p-4"
             />
@@ -151,7 +180,7 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
           ) : (
             <>
               <Wand2 className="mr-2 h-4 w-4" />
-              Forge Workout
+              Get Workout
             </>
           )}
         </Button>

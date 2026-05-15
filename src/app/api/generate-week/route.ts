@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WeeklyPlanRequestSchema, WeeklyPlanSchema, DayPlanConfig } from '@/lib/schemas';
 import { rateLimit } from '@/lib/rate-limit';
+import { withAuth } from '@workos-inc/authkit-nextjs';
+import { db } from '@/lib/db';
+import { workouts } from '@/lib/db/schema';
+import { eq, and, gte } from 'drizzle-orm';
 
 type Ex = { name: string; sets: string; reps?: string | null; duration?: string | null; rest: string; instructions: string };
 
@@ -127,12 +132,47 @@ function buildWeeklyFallback(schedule: DayPlanConfig[], goal: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const { user } = await withAuth();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  // Check daily limit for the user
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const userWorkoutsToday = await db
+    .select()
+    .from(workouts)
+    .where(
+      and(
+        eq(workouts.userId, user.id),
+        gte(workouts.createdAt, today)
+      )
+    );
+
+  if (userWorkoutsToday.length >= 2) {
+    return NextResponse.json({ 
+      error: 'Daily limit reached', 
+      message: 'You can only generate 2 workouts per day.' 
+    }, { status: 429 });
+  }
+
   const ip = req.headers.get('x-forwarded-for') ?? 'local';
   if (!rateLimit(ip, 10, 60_000)) {
     try {
       const body = await req.json();
       const data = WeeklyPlanRequestSchema.parse(body);
-      return NextResponse.json(buildWeeklyFallback(data.schedule, data.goal));
+      const fallback = buildWeeklyFallback(data.schedule, data.goal);
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     } catch {
       return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
     }
@@ -145,7 +185,15 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey || apiKey.includes('your_ai_api_key_here')) {
       console.warn('Gemini API key not found, using fallback.');
-      return NextResponse.json(buildWeeklyFallback(validatedData.schedule, validatedData.goal));
+      const fallback = buildWeeklyFallback(validatedData.schedule, validatedData.goal);
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -219,6 +267,14 @@ Ensure variety between workout days. Generate ALL ${validatedData.schedule.lengt
     try {
       const aiResponse = JSON.parse(content);
       const validatedPlan = WeeklyPlanSchema.parse(aiResponse);
+
+      // Save to DB
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(validatedPlan),
+      });
+
       return NextResponse.json(validatedPlan);
     } catch (parseError) {
       console.error('Validation/Parse Error:', parseError);
@@ -229,7 +285,15 @@ Ensure variety between workout days. Generate ALL ${validatedData.schedule.lengt
   } catch (error) {
     console.error('Weekly Plan API Error:', error);
     if (validatedData) {
-      return NextResponse.json(buildWeeklyFallback(validatedData.schedule, validatedData.goal));
+      const fallback = buildWeeklyFallback(validatedData.schedule, validatedData.goal);
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }

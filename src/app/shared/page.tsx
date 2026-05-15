@@ -17,7 +17,6 @@ import {
 } from '@/lib/export';
 import WorkoutDisplay from '@/components/WorkoutDisplay';
 import WeeklyPlanDisplay from '@/components/WeeklyPlanDisplay';
-import Header from '@/components/Header';
 import { Suspense } from 'react';
 
 function SharedContent() {
@@ -37,25 +36,25 @@ function SharedContent() {
 
   const handleExportMd = () => {
     if (type === 'weekly' && plan) {
-      downloadMarkdown(weeklyPlanToMarkdown(plan as WeeklyPlan), 'fitforge-plan.md');
+      downloadMarkdown(weeklyPlanToMarkdown(plan as WeeklyPlan), 'regimen-plan.md');
     } else if (type === 'single' && plan) {
-      downloadMarkdown(workoutToMarkdown(plan as Workout), 'fitforge-workout.md');
+      downloadMarkdown(workoutToMarkdown(plan as Workout), 'regimen-workout.md');
     }
   };
 
   const handleExportTxt = () => {
     if (type === 'weekly' && plan) {
-      downloadFile(weeklyPlanToText(plan as WeeklyPlan), 'fitforge-plan.txt', 'text/plain');
+      downloadFile(weeklyPlanToText(plan as WeeklyPlan), 'regimen-plan.txt', 'text/plain');
     } else if (type === 'single' && plan) {
-      downloadFile(workoutToText(plan as Workout), 'fitforge-workout.txt', 'text/plain');
+      downloadFile(workoutToText(plan as Workout), 'regimen-workout.txt', 'text/plain');
     }
   };
 
   const handleExportHtml = () => {
     if (type === 'weekly' && plan) {
-      downloadFile(weeklyPlanToHtml(plan as WeeklyPlan), 'fitforge-plan.html', 'text/html');
+      downloadFile(weeklyPlanToHtml(plan as WeeklyPlan), 'regimen-plan.html', 'text/html');
     } else if (type === 'single' && plan) {
-      downloadFile(workoutToHtml(plan as Workout), 'fitforge-workout.html', 'text/html');
+      downloadFile(workoutToHtml(plan as Workout), 'regimen-workout.html', 'text/html');
     }
   };
 
@@ -71,7 +70,7 @@ function SharedContent() {
         <h2 className="text-2xl font-black text-porcelain-100">Invalid or expired link</h2>
         <p className="mt-2 text-porcelain-500">This workout plan link is invalid or couldn't be decoded.</p>
         <a href="/" className="mt-6 rounded-xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 hover:-translate-y-0.5">
-          ← Back to FitForge
+          ← Back to Regimen
         </a>
       </div>
     );
@@ -133,7 +132,6 @@ function SharedContent() {
 export default function SharedPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <Suspense fallback={
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />

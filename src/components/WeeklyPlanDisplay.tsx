@@ -40,27 +40,26 @@ interface Props {
 
 const DAY_STYLE = {
   rest: {
-    text: 'text-muted-foreground',
-    badge: 'bg-muted text-muted-foreground border-border',
-    border: 'border-border/30',
-    accent: 'text-muted-foreground',
-    bg: 'bg-muted/5',
+    text: "text-muted-foreground",
+    badge: "bg-muted text-muted-foreground border-border",
+    border: "border-border/30",
+    accent: "text-muted-foreground",
+    bg: "bg-muted/5",
   },
   active: {
-    text: 'text-primary',
-    badge: 'bg-primary/10 text-primary border-primary/20',
-    border: 'border-primary/20',
-    accent: 'text-primary',
-    bg: 'bg-primary/5',
+    text: "text-primary",
+    badge: "bg-primary/10 text-primary border-primary/20",
+    border: "border-primary/20",
+    accent: "text-primary",
+    bg: "bg-primary/5",
   },
 } as const;
 
-type StyleEntry = typeof DAY_STYLE['active'] | typeof DAY_STYLE['rest'];
+type StyleEntry = (typeof DAY_STYLE)["active"] | (typeof DAY_STYLE)["rest"];
 
 function getDayStyle(isRest: boolean): StyleEntry {
   return isRest ? DAY_STYLE.rest : DAY_STYLE.active;
 }
-
 
 function DayCard({ day }: { day: DayWorkout }) {
   const [expanded, setExpanded] = useState(false);
@@ -226,7 +225,7 @@ export default function WeeklyPlanDisplay({
   onExportHtml,
   onExportPdf,
   onShare,
-} : Props) {
+}: Props) {
   const activeDays = plan.days.filter((d) => !d.isRest).length;
 
   return (
@@ -243,7 +242,7 @@ export default function WeeklyPlanDisplay({
           <Separator orientation="vertical" className="h-4" />
           <span className="opacity-70">{plan.goal}</span>
         </div>
-        <h2 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
           {plan.weekTitle}
         </h2>
 
@@ -306,7 +305,7 @@ export default function WeeklyPlanDisplay({
             onClick={onRegenerate}
             className="h-10 gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/50"
           >
-            <RotateCcw size={16} /> Re-Forge
+            <RotateCcw size={16} /> Rebuild
           </Button>
         </div>
       </div>
@@ -359,8 +358,6 @@ export default function WeeklyPlanDisplay({
           <DayCard key={d.day} day={d} />
         ))}
       </div>
-
-
     </motion.div>
   );
 }

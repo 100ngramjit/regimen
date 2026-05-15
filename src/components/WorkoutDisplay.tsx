@@ -59,7 +59,7 @@ export default function WorkoutDisplay({
           <Clock size={14} className="animate-pulse" /> {workout.totalTime}{" "}
           Minute Session
         </div>
-        <h2 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
           {workout.title}
         </h2>
 
@@ -144,7 +144,7 @@ export default function WorkoutDisplay({
             onClick={onRegenerate}
             className="h-10 gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/50"
           >
-            <RotateCcw size={16} /> Re-Forge
+            <RotateCcw size={16} /> Rebuild
           </Button>
         </div>
       </div>
@@ -174,8 +174,8 @@ export default function WorkoutDisplay({
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6">
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
-                          <p className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
-                            <span className="h-8 w-8 flex items-center justify-center rounded bg-primary text-primary-foreground text-sm font-black border border-primary/20 shadow-lg shadow-primary/10">
+                          <p className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
+                            <span className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded bg-primary text-primary-foreground text-xs sm:text-sm font-black border border-primary/20 shadow-lg shadow-primary/10">
                               {ei + 1}
                             </span>
                             {ex.name}

@@ -1,19 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WorkoutRequestSchema, WorkoutSchema } from '@/lib/schemas';
 import { generateFallbackWorkout } from '@/lib/rule-engine';
 import { rateLimit } from '@/lib/rate-limit';
+import { withAuth } from '@workos-inc/authkit-nextjs';
+import { db } from '@/lib/db';
+import { workouts } from '@/lib/db/schema';
+import { eq, and, gte } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
+  const { user } = await withAuth();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  // Check daily limit for the user
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const userWorkoutsToday = await db
+    .select()
+    .from(workouts)
+    .where(
+      and(
+        eq(workouts.userId, user.id),
+        gte(workouts.createdAt, today)
+      )
+    );
+
+  if (userWorkoutsToday.length >= 2) {
+    return NextResponse.json({ 
+      error: 'Daily limit reached', 
+      message: 'You can only generate 2 workouts per day.' 
+    }, { status: 429 });
+  }
+
   const ip = req.headers.get('x-forwarded-for') ?? 'local';
   if (!rateLimit(ip, 10, 60_000)) {
     // Serve fallback silently instead of 429 — user still gets a workout
     try {
       const body = await req.json();
       const data = WorkoutRequestSchema.parse(body);
-      return NextResponse.json(generateFallbackWorkout(data));
+      const fallback = generateFallbackWorkout(data);
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     } catch {
-      return NextResponse.json(generateFallbackWorkout({}));
+      const fallback = generateFallbackWorkout({});
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
   }
   let validatedData;
@@ -24,7 +72,15 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey || apiKey.includes('your_ai_api_key_here')) {
       console.warn('Gemini API key not found, using fallback.');
-      return NextResponse.json(generateFallbackWorkout(validatedData));
+      const fallback = generateFallbackWorkout(validatedData);
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -92,15 +148,44 @@ Schema:
     try {
       const aiResponse = JSON.parse(content);
       const validatedWorkout = WorkoutSchema.parse(aiResponse);
+
+      // Save to DB
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(validatedWorkout),
+      });
+
       return NextResponse.json(validatedWorkout);
     } catch (parseError) {
       console.warn('AI parse/validation error, using fallback:', parseError);
-      return NextResponse.json(generateFallbackWorkout(validatedData));
+      const fallback = generateFallbackWorkout(validatedData);
+      
+      // Save fallback to DB as well so it counts towards the limit
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
   } catch (error) {
     console.error('API Error:', error);
     if (validatedData) {
-      return NextResponse.json(generateFallbackWorkout(validatedData));
+      const fallback = generateFallbackWorkout(validatedData);
+      
+      // Even on major error, if we serve a workout, we count it? 
+      // Actually, if it's an "unexpected error" we might not want to count it if it's a 500.
+      // But generateFallbackWorkout usually works.
+      
+      await db.insert(workouts).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        content: JSON.stringify(fallback),
+      });
+
+      return NextResponse.json(fallback);
     }
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
