@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Alegreya_Sans } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import Header from "@/components/Header";
 import "./globals.css";
 
-const alegreyaSans = Alegreya_Sans({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
+});
+
+const ibmPlexSerif = IBM_Plex_Serif({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-serif",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${alegreyaSans.variable} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexSerif.variable} dark`} suppressHydrationWarning>
       <body className="antialiased font-sans bg-background text-foreground">
         <Header />
         {children}

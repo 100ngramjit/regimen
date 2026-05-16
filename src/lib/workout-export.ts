@@ -210,8 +210,11 @@ export function toHtml(plan: ExportPlan) {
       margin: 0;
       background: #f7f7f5;
       color: #171717;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.5;
+    }
+    h1 {
+      font-family: "IBM Plex Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     }
     main { max-width: 1040px; margin: 0 auto; padding: 48px 24px; }
     h1 { margin: 0 0 8px; font-size: 34px; line-height: 1.1; }
@@ -265,7 +268,6 @@ function downloadTextFile(filename: string, content: string, type: string) {
 }
 
 function printHtml(html: string) {
-  // Create a hidden iframe to avoid popup blockers
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
@@ -278,7 +280,6 @@ function printHtml(html: string) {
 
   const doc = iframe.contentWindow?.document;
   if (!doc) {
-    // Fallback to direct download if iframe is not accessible
     downloadTextFile("regimen-workout.html", html, "text/html;charset=utf-8");
     return;
   }
@@ -287,11 +288,9 @@ function printHtml(html: string) {
   doc.write(html);
   doc.close();
 
-  // Wait for images/styles to load then print
   const handlePrint = () => {
     iframe.contentWindow?.focus();
     iframe.contentWindow?.print();
-    // Clean up after a delay to allow the print dialog to open
     setTimeout(() => {
       if (document.body.contains(iframe)) {
         document.body.removeChild(iframe);
@@ -301,7 +300,6 @@ function printHtml(html: string) {
 
   if (iframe.contentWindow) {
     iframe.onload = handlePrint;
-    // For browsers where onload might not trigger correctly for written content
     setTimeout(handlePrint, 500);
   } else {
     handlePrint();

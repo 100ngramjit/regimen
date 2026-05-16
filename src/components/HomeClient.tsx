@@ -62,10 +62,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
   const [isLoadingUsage, setIsLoadingUsage] = useState(true);
   const [reforgeMode, setReforgeMode] = useState<PlannerMode | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lastSingleReq, setLastSingleReq] = useDbState<WorkoutRequest | null>(
-    "regimen:workout:latest:request",
-    null,
-  );
   const [, setLastWeeklyReq] = useDbState<WeeklyPlanRequest | null>(
     "regimen:weekly:latest:request",
     null,
@@ -92,7 +88,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
   const generateWorkout = async (data: WorkoutRequest) => {
     setIsLoading(true);
     setError(null);
-    setLastSingleReq(data);
     try {
       const res = await fetch("/api/generate-workout", {
         method: "POST",
@@ -170,14 +165,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const adjustWorkout = (type: "harder" | "easier") => {
-    if (!lastSingleReq) return;
-    generateWorkout({
-      ...lastSingleReq,
-      notes: `${lastSingleReq.notes || ""} Make it ${type}.`,
-    });
   };
 
   const beginReforge = () => {
@@ -367,7 +354,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
                           <WorkoutDisplay
                             workout={workout}
                             onRegenerate={beginReforge}
-                            onAdjust={adjustWorkout}
                           />
                         ) : null}
                       </CardContent>

@@ -5,8 +5,6 @@ import { Workout } from "@/lib/schemas";
 import {
   Clock,
   CheckCircle2,
-  TrendingUp,
-  TrendingDown,
   Dumbbell,
   Timer,
   Repeat,
@@ -18,7 +16,6 @@ import PlanActions from "@/components/PlanActions";
 interface Props {
   workout: Workout;
   onRegenerate: () => void;
-  onAdjust: (type: "harder" | "easier") => void;
 }
 
 function ExerciseCard({
@@ -91,7 +88,6 @@ function ExerciseCard({
 export default function WorkoutDisplay({
   workout,
   onRegenerate,
-  onAdjust,
 }: Props) {
   return (
     <motion.div
@@ -109,23 +105,6 @@ export default function WorkoutDisplay({
         </h2>
 
         <div className="flex items-center justify-center gap-3 pt-2">
-          <div className="flex items-center rounded-lg border border-border/40 bg-muted/20 p-0.5">
-            <button
-              onClick={() => onAdjust("easier")}
-              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-            >
-              <TrendingDown size={13} />
-              Easier
-            </button>
-            <div className="h-4 w-px bg-border/40 mx-0.5" />
-            <button
-              onClick={() => onAdjust("harder")}
-              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-            >
-              <TrendingUp size={13} />
-              Harder
-            </button>
-          </div>
           <PlanActions
             onRegenerate={onRegenerate}
             exportData={{ type: "single", workout }}
