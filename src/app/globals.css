@@ -143,8 +143,9 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground text-lg selection:bg-primary/20 selection:text-primary;
+    @apply text-foreground text-lg selection:bg-primary/20 selection:text-primary;
     font-feature-settings: "cv11", "ss01";
+    background: var(--background) url('/bg-texture.png') repeat fixed;
   }
   h1,
   h2,

@@ -7,17 +7,85 @@ import {
   CheckCircle2,
   TrendingUp,
   TrendingDown,
+  Dumbbell,
+  Timer,
+  Repeat,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
 import PlanActions from "@/components/PlanActions";
 
 interface Props {
   workout: Workout;
   onRegenerate: () => void;
   onAdjust: (type: "harder" | "easier") => void;
+}
+
+function ExerciseCard({
+  number,
+  name,
+  sets,
+  reps,
+  duration,
+  rest,
+  instructions,
+}: {
+  number: number;
+  name: string;
+  sets?: string | null;
+  reps?: string | null;
+  duration?: string | null;
+  rest: string;
+  instructions?: string | null;
+}) {
+  return (
+    <div className="group relative rounded-xl border border-border/50 bg-card/30 p-5 transition-all hover:border-primary/20 hover:bg-card/50 hover:shadow-md">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary border border-primary/20">
+            {number}
+          </span>
+          <div className="min-w-0">
+            <h4 className="text-base font-semibold text-foreground truncate">
+              {name}
+            </h4>
+            {instructions && (
+              <p className="mt-1 text-sm text-muted-foreground/80 leading-relaxed">
+                {instructions}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <div className="flex flex-wrap items-center gap-2 justify-end">
+            {sets && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-foreground/10 px-2.5 py-1 text-[11px] font-semibold text-foreground border border-foreground/10">
+                <Repeat size={12} className="opacity-70" />
+                {sets}
+              </span>
+            )}
+            {reps && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary border border-primary/20">
+                <Dumbbell size={12} className="opacity-70" />
+                {reps}
+              </span>
+            )}
+            {duration && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <Timer size={12} className="opacity-70" />
+                {duration}
+              </span>
+            )}
+          </div>
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground/70">
+            <Clock size={11} className="text-primary/60" />
+            Rest {rest}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function WorkoutDisplay({
@@ -29,41 +97,35 @@ export default function WorkoutDisplay({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 max-w-2xl mx-auto w-full px-2 sm:px-0"
+      className="space-y-10 w-full"
     >
-      {/* Header */}
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary shadow-sm">
-          <Clock size={14} className="animate-pulse" /> {workout.totalTime}{" "}
-          Minute Session
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-sm">
+          <Clock size={13} />
+          {workout.totalTime} Minutes
         </div>
-        <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
           {workout.title}
         </h2>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
-          <div className="flex items-center bg-muted/30 rounded-full p-1 border border-border/40 backdrop-blur-sm">
-            <Button
-              variant="ghost"
-              size="icon"
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="flex items-center rounded-lg border border-border/40 bg-muted/20 p-0.5">
+            <button
               onClick={() => onAdjust("easier")}
-              className="rounded-full h-8 w-8 hover:bg-destructive/10 hover:text-destructive transition-colors"
-              title="Make Easier"
+              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
             >
-              <TrendingDown size={14} />
-            </Button>
-            <Separator orientation="vertical" className="h-4 mx-1 opacity-20" />
-            <Button
-              variant="ghost"
-              size="icon"
+              <TrendingDown size={13} />
+              Easier
+            </button>
+            <div className="h-4 w-px bg-border/40 mx-0.5" />
+            <button
               onClick={() => onAdjust("harder")}
-              className="rounded-full h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
-              title="Make Harder"
+              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
             >
-              <TrendingUp size={14} />
-            </Button>
+              <TrendingUp size={13} />
+              Harder
+            </button>
           </div>
-
           <PlanActions
             onRegenerate={onRegenerate}
             exportData={{ type: "single", workout }}
@@ -71,88 +133,39 @@ export default function WorkoutDisplay({
         </div>
       </div>
 
-      <Separator className="bg-border/40" />
-
-      {/* Sections */}
-      <div className="space-y-16">
+      <div className="space-y-12">
         {workout.sections.map((section, si) => (
-          <div key={si} className="space-y-8">
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border/60 to-transparent" />
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/60 px-5 py-2 rounded-full border border-border/40 bg-muted/10 whitespace-nowrap">
+          <div key={si} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border/30" />
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/50 px-3">
                 {section.name}
               </h3>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+              <div className="h-px flex-1 bg-border/30" />
             </div>
 
-            <div className="grid gap-4">
+            <div className="space-y-2.5">
               {section.exercises.map((ex, ei) => (
-                <Card
+                <ExerciseCard
                   key={ei}
-                  className="group relative border-border/40 bg-card/40 backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-card/60 hover:shadow-xl overflow-hidden"
-                >
-                  <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/50 to-accent/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                          <p className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
-                            <span className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded bg-primary text-primary-foreground text-xs sm:text-sm font-black border border-primary/20 shadow-lg shadow-primary/10">
-                              {ei + 1}
-                            </span>
-                            {ex.name}
-                          </p>
-                        </div>
-                        {ex.instructions && (
-                          <p className="text-base leading-relaxed text-foreground/90 max-w-lg pl-11 italic">
-                            {ex.instructions}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="flex shrink-0 flex-col items-end gap-3 pl-11 md:pl-0">
-                        <div className="flex items-center gap-3">
-                          {ex.sets && (
-                            <span className="rounded-lg bg-foreground text-background px-4 py-1.5 text-xs font-black uppercase tracking-widest border border-border/40 shadow-md">
-                              {ex.sets} SETS
-                            </span>
-                          )}
-                          {ex.reps && (
-                            <span className="rounded-lg bg-primary/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-primary border border-primary/20 shadow-sm">
-                              {ex.reps} REPS
-                            </span>
-                          )}
-                          {ex.duration && (
-                            <span className="rounded-lg bg-secondary/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-secondary border border-secondary/20 shadow-sm">
-                              {ex.duration}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 font-bold text-foreground/70">
-                          <Clock size={14} className="text-primary" />
-                          <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-                            Rest: {ex.rest}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  number={ei + 1}
+                  name={ex.name}
+                  sets={ex.sets}
+                  reps={ex.reps}
+                  duration={ex.duration}
+                  rest={ex.rest}
+                  instructions={ex.instructions}
+                />
               ))}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="pt-8">
-        <Button className="w-full h-16 rounded-2xl text-base font-black tracking-[0.3em] uppercase transition-all shadow-2xl hover:scale-[1.01] active:scale-[0.99] group bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
-          <CheckCircle2
-            size={24}
-            className="mr-3 group-hover:scale-110 transition-transform"
-          />
-          Finalize & Log Session
-        </Button>
-      </div>
+      <Button className="w-full h-13 rounded-xl text-sm font-semibold tracking-tight shadow-lg bg-primary hover:opacity-90 transition-all">
+        <CheckCircle2 size={18} className="mr-2" />
+        Complete & Log Workout
+      </Button>
     </motion.div>
   );
 }

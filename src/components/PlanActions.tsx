@@ -32,7 +32,7 @@ const EXPORT_OPTIONS: {
   label: string;
   icon: typeof FileText;
 }[] = [
-  { format: "sheets", label: "Sheets", icon: FileSpreadsheet },
+  { format: "sheets", label: "Google Sheets", icon: FileSpreadsheet },
   { format: "md", label: "Markdown", icon: FileText },
   { format: "html", label: "HTML", icon: Code2 },
   { format: "pdf", label: "PDF", icon: FileDown },
@@ -44,30 +44,29 @@ export default function PlanActions({
   exportData,
 }: PlanActionsProps) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+    <div className="flex items-center gap-2">
       {exportData && (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button
               variant="outline"
               size="sm"
-              className="h-10 gap-2 rounded-lg text-xs font-bold uppercase tracking-widest"
+              className="h-8 gap-1.5 rounded-lg text-xs font-medium"
             >
-              <Download size={16} />
+              <Download size={14} />
               Export
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="min-w-44">
+          <DropdownMenuContent className="min-w-40">
             {EXPORT_OPTIONS.map((option) => {
               const Icon = option.icon;
-
               return (
                 <DropdownMenuItem
                   key={option.format}
-                  className="gap-2 text-xs font-bold uppercase tracking-wider"
+                  className="gap-2 text-xs font-medium"
                   onSelect={() => exportPlan(exportData, option.format)}
                 >
-                  <Icon size={15} />
+                  <Icon size={15} className="opacity-70" />
                   {option.label}
                 </DropdownMenuItem>
               );
@@ -82,9 +81,10 @@ export default function PlanActions({
           size="sm"
           onClick={onRegenerate}
           disabled={!canRegenerate}
-          className="h-10 gap-2 rounded-lg text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/50"
+          className="h-8 gap-1.5 rounded-lg text-xs font-medium text-muted-foreground"
         >
-          <RotateCcw size={16} /> Reforge
+          <RotateCcw size={14} />
+          Reforge
         </Button>
       )}
     </div>

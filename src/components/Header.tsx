@@ -1,8 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { CalendarDays, Dumbbell, Zap } from "lucide-react";
-import { ModeToggle } from "./mode-toggle";
-import { withAuth } from '@workos-inc/authkit-nextjs';
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +16,12 @@ export default async function Header() {
   const { user } = await withAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 backdrop-blur-[2px]">
       <div className="max-w-4xl mx-auto flex h-16 items-center justify-between px-5 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/10 ring-1 ring-primary/20">
             <Dumbbell size={16} />
           </div>
@@ -30,11 +32,17 @@ export default async function Header() {
         {/* Desktop Nav Links */}
         {user && (
           <nav className="hidden md:flex items-center gap-6 mr-auto ml-8">
-            <Link href="/weekly" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
+            <Link
+              href="/weekly"
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+            >
               <CalendarDays size={13} />
               Weekly
             </Link>
-            <Link href="/session" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
+            <Link
+              href="/session"
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+            >
               <Zap size={13} />
               Session
             </Link>
@@ -43,10 +51,6 @@ export default async function Header() {
 
         {/* Global Actions */}
         <div className="flex items-center gap-3 sm:gap-6">
-          <div className="hidden sm:block">
-            <ModeToggle />
-          </div>
-
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
@@ -58,7 +62,9 @@ export default async function Header() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2 border-border/50 bg-background/95 backdrop-blur-xl">
+              <DropdownMenuContent
+                className="w-56 mt-2 border-border/50 bg-background/95 backdrop-blur-xl"
+              >
                 <DropdownMenuLabel className="flex flex-col">
                   <span className="text-xs font-black uppercase tracking-wider">
                     {user.firstName} {user.lastName}
@@ -68,7 +74,7 @@ export default async function Header() {
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/50" />
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem>
                   <Link
                     href="/weekly"
                     className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
@@ -76,7 +82,7 @@ export default async function Header() {
                     Weekly planner
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem>
                   <Link
                     href="/session"
                     className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
@@ -84,17 +90,10 @@ export default async function Header() {
                     Single session
                   </Link>
                 </DropdownMenuItem>
-                <div className="sm:hidden">
-                   <DropdownMenuSeparator className="bg-border/50" />
-                   <div className="px-2 py-1.5 flex justify-between items-center">
-                     <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Theme</span>
-                     <ModeToggle />
-                   </div>
-                </div>
                 <DropdownMenuSeparator className="bg-border/50" />
-                <DropdownMenuItem asChild>
-                  <Link 
-                    href="/api/auth/logout" 
+                <DropdownMenuItem>
+                  <Link
+                    href="/api/auth/logout"
                     className="w-full text-left text-xs font-bold uppercase tracking-wider text-destructive cursor-pointer focus:bg-destructive/5 focus:text-destructive px-2 py-1.5 rounded-sm outline-none"
                   >
                     Sign Out
@@ -104,17 +103,12 @@ export default async function Header() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2 sm:gap-4">
-              <div className="hidden sm:flex items-center gap-2 sm:gap-4">
-                <Link
-                  href="/api/auth/login"
-                  className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground transition-colors hover:text-primary px-2"
-                >
-                  Sign In
-                </Link>
-              </div>
-              <div className="sm:hidden ml-1">
-                <ModeToggle />
-              </div>
+              <Link
+                href="/api/auth/login"
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground transition-colors hover:text-primary px-2"
+              >
+                Sign In
+              </Link>
             </div>
           )}
         </div>

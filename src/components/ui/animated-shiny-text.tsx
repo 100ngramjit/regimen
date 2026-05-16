@@ -2,12 +2,12 @@ import {
   type ComponentPropsWithoutRef,
   type CSSProperties,
   type FC,
-} from "react"
+} from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 export interface AnimatedShinyTextProps extends ComponentPropsWithoutRef<"span"> {
-  shimmerWidth?: number
+  shimmerWidth?: number;
 }
 
 export const AnimatedShinyText: FC<AnimatedShinyTextProps> = ({
@@ -27,20 +27,20 @@ export const AnimatedShinyText: FC<AnimatedShinyTextProps> = ({
         "inline-block bg-clip-text text-transparent",
 
         // Multiple backgrounds: Shimmer (layer 0) and Base Gradient (layer 1)
-        "bg-[linear-gradient(110deg,transparent,35%,rgba(255,255,255,0.95),50%,rgba(255,255,255,0.95),65%,transparent),linear-gradient(to_right,var(--accent),var(--primary))]",
-        
+        "bg-[linear-gradient(110deg,transparent,35%,rgba(255,255,255,0.95),50%,rgba(255,255,255,0.95),65%,transparent),linear-gradient(to_right,var(--muted-foreground),var(--primary))]",
+
         // Background settings
         "bg-no-repeat",
         "[background-size:var(--shiny-width)_100%,100%_100%]",
-        
+
         // Animation
         "animate-shiny-text",
 
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </span>
-  )
-}
+  );
+};

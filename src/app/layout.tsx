@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/Header";
 import "./globals.css";
 
@@ -21,17 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={alegreyaSans.variable} suppressHydrationWarning>
-      <body className="antialiased font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Header />
-          {children}
-        </ThemeProvider>
+    <html lang="en" className={`${alegreyaSans.variable} dark`} suppressHydrationWarning>
+      <body className="antialiased font-sans bg-background text-foreground">
+        <Header />
+        {children}
       </body>
     </html>
   );

@@ -13,22 +13,12 @@ import {
   WeeklyPlan,
   WeeklyPlanRequest,
 } from "@/lib/schemas";
-import {
-  Zap,
-  CalendarDays,
-  Clock3,
-  Hammer,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Zap, CalendarDays, Hammer, AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import UsageCard from "@/components/UsageCard";
 
 export type PlannerMode = "single" | "weekly";
 
@@ -40,45 +30,46 @@ const MODE_LINKS: {
   value: PlannerMode;
   href: string;
   label: string;
-  shortLabel: string;
   icon: typeof CalendarDays;
 }[] = [
   {
     value: "weekly",
     href: "/weekly",
     label: "Weekly Plan",
-    shortLabel: "Weekly",
     icon: CalendarDays,
   },
   {
     value: "single",
     href: "/session",
     label: "Single Session",
-    shortLabel: "Single",
     icon: Zap,
   },
 ];
 
 export default function HomeClient({ mode }: HomeClientProps) {
   const [workout, setWorkout, isLoadingWorkout] = useDbState<Workout | null>(
-    "ff-last-workout",
+    "regimen:workout:latest:result",
     null,
   );
-  const [weeklyPlan, setWeeklyPlan, isLoadingWeekly] = useDbState<WeeklyPlan | null>(
-    "ff-last-weekly",
-    null,
-  );
+  const [weeklyPlan, setWeeklyPlan, isLoadingWeekly] =
+    useDbState<WeeklyPlan | null>("regimen:weekly:latest:result", null);
   const [isLoading, setIsLoading] = useState(false);
-  const [usage, setUsage] = useState<{ count: number; limit: number; remaining: number } | null>(null);
+  const [usage, setUsage] = useState<{
+    count: number;
+    limit: number;
+    remaining: number;
+  } | null>(null);
   const [isLoadingUsage, setIsLoadingUsage] = useState(true);
   const [reforgeMode, setReforgeMode] = useState<PlannerMode | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastSingleReq, setLastSingleReq] = useDbState<WorkoutRequest | null>(
-    "ff-last-single-req",
+    "regimen:workout:latest:request",
     null,
   );
-  const [, setLastWeeklyReq] =
-    useDbState<WeeklyPlanRequest | null>("ff-last-weekly-req", null);
+  const [, setLastWeeklyReq] = useDbState<WeeklyPlanRequest | null>(
+    "regimen:weekly:latest:request",
+    null,
+  );
 
   const fetchUsage = async () => {
     try {
@@ -97,7 +88,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
   React.useEffect(() => {
     fetchUsage();
   }, []);
-
 
   const generateWorkout = async (data: WorkoutRequest) => {
     setIsLoading(true);
@@ -182,7 +172,6 @@ export default function HomeClient({ mode }: HomeClientProps) {
     }
   };
 
-
   const adjustWorkout = (type: "harder" | "easier") => {
     if (!lastSingleReq) return;
     generateWorkout({
@@ -204,295 +193,200 @@ export default function HomeClient({ mode }: HomeClientProps) {
 
   const isInitialLoading = isLoadingWorkout || isLoadingWeekly;
   const showResult =
-    !isInitialLoading && ((mode === "weekly" && weeklyPlan) || (mode === "single" && workout));
+    !isInitialLoading &&
+    ((mode === "weekly" && weeklyPlan) || (mode === "single" && workout));
   const isReforging = reforgeMode === mode;
   const showForm = !showResult || isReforging;
-  const description =
-    mode === "weekly"
-      ? "Set the training rhythm, constraints, and equipment once, then get a complete split with rest built in."
-      : "Dial in your goal, time, and equipment for a focused workout you can start immediately.";
-  const resultLabel = mode === "weekly" ? "Weekly plan" : "Workout";
-  const formTitle =
-    mode === "weekly"
-      ? isReforging
-        ? "Reforge Your Week"
-        : "Plan Your Week"
-      : isReforging
-        ? "Reforge Session"
-        : "Generate a Session";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors duration-300">
-      <main className="flex flex-1 flex-col items-center px-5 py-6 md:py-10">
-        <div className="flex w-full max-w-6xl flex-col gap-6">
-          <div className="w-full space-y-10">
-            <div className="flex flex-col gap-4 rounded-lg border border-border/40 bg-card/35 p-3 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
-              <div className="grid grid-cols-2 gap-2 sm:w-auto">
-                {MODE_LINKS.map((item) => {
-                  const Icon = item.icon;
-                  const active = mode === item.value;
-                  return (
-                    <Link
-                      key={item.value}
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex h-12 items-center justify-center gap-2 rounded-md px-4 text-xs font-black uppercase tracking-[0.14em] transition-colors",
-                        active
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                      )}
-                    >
-                      <Icon size={16} className="shrink-0" />
-                      <span className="hidden min-[420px]:inline">{item.label}</span>
-                      <span className="min-[420px]:hidden">{item.shortLabel}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
-                  <Clock3 size={15} className="text-primary" />
-                  {showResult
-                    ? `${resultLabel} ready`
-                    : "Your inputs autosave as you go."}
-                </div>
-                {showResult && !showForm && (
-                  <Button
-                    type="button"
-                    onClick={beginReforge}
-                    size="sm"
-                    className="h-10 gap-2 rounded-md text-xs font-black uppercase tracking-[0.14em]"
-                  >
-                    <Hammer size={15} />
-                    Reforge
-                  </Button>
-                )}
-              </div>
-            </div>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1 px-4 sm:px-6 py-6 md:py-10">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Mode switcher */}
+          <div className="flex items-center justify-center gap-1 rounded-xl border border-border/40 bg-card/30 p-1 w-fit mx-auto shadow-sm">
+            {MODE_LINKS.map((m) => {
+              const Icon = m.icon;
+              const isActive = mode === m.value;
+              return (
+                <Link
+                  key={m.value}
+                  href={m.href}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                  )}
+                >
+                  <Icon size={16} />
+                  <span className="hidden sm:inline">{m.label}</span>
+                  <span className="sm:hidden">
+                    {m.label.split(" ")[0]}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
 
-            {isInitialLoading ? (
-              <section className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
-                <Card className="overflow-hidden border-border/40 bg-card/55 shadow-xl backdrop-blur-sm">
-                  <CardHeader className="pb-6 pt-7 sm:px-8">
-                    <div className="h-10 w-1/3 animate-pulse rounded-lg bg-muted/30" />
-                    <div className="mt-2 h-6 w-2/3 animate-pulse rounded-lg bg-muted/20" />
-                  </CardHeader>
-                  <CardContent className="space-y-6 pb-8 sm:px-8">
-                    <div className="h-32 w-full animate-pulse rounded-xl bg-muted/10" />
-                    <div className="h-32 w-full animate-pulse rounded-xl bg-muted/10" />
-                  </CardContent>
-                </Card>
-                <aside className="space-y-4">
-                  <div className="rounded-lg border border-border/40 bg-muted/20 p-5">
-                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      <Hammer size={15} className="text-primary animate-spin" />
-                      Scanning database...
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-8 w-3/4 animate-pulse rounded-md bg-primary/10" />
-                      <div className="h-4 w-full animate-pulse rounded-md bg-muted/30" />
-                    </div>
+          {/* Error */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+            >
+              <AlertCircle size={16} />
+              {error}
+            </motion.div>
+          )}
+
+          {/* Loading skeleton */}
+          {isInitialLoading ? (
+            <div className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start">
+              <Card className="border-border/40 shadow-sm">
+                <CardContent className="p-8 space-y-6">
+                  <div className="h-8 w-1/3 animate-pulse rounded-lg bg-muted/30" />
+                  <div className="h-5 w-2/3 animate-pulse rounded-lg bg-muted/20" />
+                  <div className="h-40 w-full animate-pulse rounded-xl bg-muted/10" />
+                  <div className="h-40 w-full animate-pulse rounded-xl bg-muted/10" />
+                </CardContent>
+              </Card>
+              <aside className="space-y-4">
+                <div className="rounded-xl border border-border/40 bg-muted/20 p-5 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <Hammer size={14} className="text-primary animate-spin" />
+                    Loading...
                   </div>
-                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
-                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      <Zap size={15} className="text-primary" />
-                      Daily Allowance
-                    </div>
-                    {isLoadingUsage ? (
-                      <div className="h-6 w-1/2 animate-pulse rounded-md bg-muted/30" />
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black tracking-tight text-primary">
-                            {usage?.remaining ?? 0}
-                          </span>
-                          <span className="mb-1 text-xs font-bold text-muted-foreground">
-                            OF {usage?.limit ?? 2} LEFT
-                          </span>
-                        </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((usage?.remaining ?? 0) / (usage?.limit ?? 2)) * 100}%` }}
-                            className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]"
-                          />
-                        </div>
+                  <div className="h-6 w-3/4 animate-pulse rounded bg-muted/30" />
+                </div>
+                <UsageCard usage={usage} isLoading={isLoadingUsage} />
+              </aside>
+            </div>
+          ) : (
+            <>
+              {/* Form and sidebar */}
+              {showForm && (
+                <section
+                  id="composer"
+                  className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start"
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${mode}-${isReforging ? "reforge" : "new"}`}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card className="border-border/40 shadow-sm">
+                        <CardContent className="p-6 sm:p-8">
+                          <div className="mb-8">
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                              {mode === "weekly"
+                                ? isReforging
+                                  ? "Reforge Your Week"
+                                  : "Plan Your Week"
+                                : isReforging
+                                  ? "Reforge Session"
+                                  : "New Session"}
+                            </h1>
+                            <p className="mt-1.5 text-sm text-muted-foreground">
+                              {mode === "weekly"
+                                ? "Configure your weekly split, then let AI build your regimen."
+                                : "Set your preferences and get a tailored workout."}
+                            </p>
+                          </div>
+                          {mode === "weekly" ? (
+                            <WeeklyPlanForm
+                              onGenerate={generateWeekly}
+                              isLoading={isLoading}
+                            />
+                          ) : (
+                            <WorkoutForm
+                              onGenerate={generateWorkout}
+                              isLoading={isLoading}
+                            />
+                          )}
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  <aside className="space-y-4">
+                    <div className="rounded-xl border border-border/40 bg-card/30 p-5 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                        <Hammer size={14} className="text-primary" />
+                        {isReforging ? "Refining" : "Ready"}
                       </div>
-                    )}
-                  </div>
-                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      Good prompts
-                    </p>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                      Mention injuries, disliked movements, available machines,
-                      target muscles, and how hard you want the session to feel.
-                    </p>
-                  </div>
-                </aside>
-              </section>
-            ) : showForm && (
-              <section
-                id="composer"
-                className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start"
-              >
-                <AnimatePresence mode="wait">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {showResult
+                          ? "Update your constraints below and regenerate."
+                          : "Fill in your preferences and generate a workout plan."}
+                      </p>
+                    </div>
+                    <UsageCard usage={usage} isLoading={isLoadingUsage} />
+                    <div className="rounded-xl border border-border/40 bg-card/30 p-5 space-y-3">
+                      <p className="text-xs font-semibold text-muted-foreground">
+                        Pro Tips
+                      </p>
+                      <ul className="text-sm text-muted-foreground/80 space-y-1.5">
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">·</span>
+                          Mention injuries or limitations
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">·</span>
+                          Specify target muscle groups
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary mt-0.5">·</span>
+                          Set desired intensity level
+                        </li>
+                      </ul>
+                    </div>
+                  </aside>
+                </section>
+              )}
+
+              {/* Result */}
+              {showResult && (
+                <section className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start">
                   <motion.div
-                    key={`${mode}-${isReforging ? "reforge" : "new"}`}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
+                    id="result"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                   >
-                    <Card className="overflow-hidden border-border/40 bg-card/55 shadow-xl backdrop-blur-sm">
-                      <CardHeader className="pb-6 pt-7 sm:px-8">
-                        <CardTitle className="text-3xl font-black tracking-tight sm:text-4xl">
-                          {formTitle}
-                        </CardTitle>
-                        <CardDescription className="max-w-2xl text-base">
-                          {description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="pb-8 sm:px-8">
-                        {mode === "weekly" ? (
-                          <WeeklyPlanForm
-                            onGenerate={generateWeekly}
-                            isLoading={isLoading}
+                    <Card className="border-primary/10 shadow-md ring-1 ring-primary/5">
+                      <CardContent className="p-6 sm:p-8">
+                        {mode === "weekly" && weeklyPlan ? (
+                          <WeeklyPlanDisplay
+                            plan={weeklyPlan}
+                            onRegenerate={beginReforge}
                           />
-                        ) : (
-                          <WorkoutForm
-                            onGenerate={generateWorkout}
-                            isLoading={isLoading}
+                        ) : mode === "single" && workout ? (
+                          <WorkoutDisplay
+                            workout={workout}
+                            onRegenerate={beginReforge}
+                            onAdjust={adjustWorkout}
                           />
-                        )}
+                        ) : null}
                       </CardContent>
                     </Card>
                   </motion.div>
-                </AnimatePresence>
 
-                <aside className="space-y-4">
-                  <div className="rounded-lg border border-border/40 bg-muted/20 p-5">
-                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      <Hammer size={15} className="text-primary" />
-                      {isInitialLoading ? "Scanning database..." : showResult ? "Reforge mode" : "Current output"}
-                    </div>
-                    {isInitialLoading ? (
-                      <div className="space-y-2">
-                        <div className="h-8 w-3/4 animate-pulse rounded-md bg-primary/10" />
-                        <div className="h-4 w-full animate-pulse rounded-md bg-muted/30" />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-2xl font-black tracking-tight">
-                          {showResult ? "Tune and replace" : "No plan yet"}
-                        </p>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                          {showResult
-                            ? "Update your constraints, generate again, and the new result will replace the current one."
-                            : "Generate once and this panel becomes your launch point for reviewing the result."}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
-                    <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      <Zap size={15} className="text-primary" />
-                      Daily Allowance
-                    </div>
-                    {isLoadingUsage ? (
-                      <div className="h-6 w-1/2 animate-pulse rounded-md bg-muted/30" />
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="flex items-end gap-2">
-                          <span className="text-3xl font-black tracking-tight text-primary">
-                            {usage?.remaining ?? 0}
-                          </span>
-                          <span className="mb-1 text-xs font-bold text-muted-foreground">
-                            OF {usage?.limit ?? 2} LEFT
-                          </span>
-                        </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((usage?.remaining ?? 0) / (usage?.limit ?? 2)) * 100}%` }}
-                            className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]"
-                          />
-                        </div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-                          Resets at midnight
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="rounded-lg border border-border/40 bg-card/35 p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      Good prompts
-                    </p>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                      Mention injuries, disliked movements, available machines,
-                      target muscles, and how hard you want the session to feel.
-                    </p>
-                  </div>
-                </aside>
-              </section>
-            )}
-
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-lg border border-destructive/50 bg-destructive/10 px-5 py-4 text-center text-sm font-medium text-destructive backdrop-blur-md"
-              >
-                {error}
-              </motion.div>
-            )}
-
-            {/* Result Area */}
-            {showResult && (
-              <motion.div
-                id="result"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8"
-              >
-                <Card className="overflow-hidden border-primary/20 bg-card/60 shadow-2xl ring-1 ring-primary/10 backdrop-blur-md">
-                  <CardHeader className="border-b border-border/40 pb-6 pt-8">
-                    <div>
-                      <CardTitle className="text-3xl font-black tracking-tight">
-                        Your Regimen
-                      </CardTitle>
-                      <CardDescription className="text-base">
-                        Optimized and ready for execution.
-                      </CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="py-6 sm:py-10">
-                    {mode === "weekly" && weeklyPlan ? (
-                      <WeeklyPlanDisplay
-                        plan={weeklyPlan}
-                        onRegenerate={beginReforge}
-                      />
-                    ) : mode === "single" && workout ? (
-                      <WorkoutDisplay
-                        workout={workout}
-                        onRegenerate={beginReforge}
-                        onAdjust={adjustWorkout}
-                      />
-                    ) : null}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </div>
+                  <aside className="space-y-4">
+                    <UsageCard usage={usage} isLoading={isLoadingUsage} />
+                  </aside>
+                </section>
+              )}
+            </>
+          )}
         </div>
       </main>
 
-
-      <footer className="mt-auto border-t border-border/40 py-12 sm:py-16 text-center px-6">
-        <p className="text-[10px] sm:text-xs font-black tracking-[0.2em] sm:tracking-[0.6em] uppercase text-muted-foreground/60 leading-relaxed">
-          2026 Regimen AI · Scientific Excellence in Training
+      <footer className="border-t border-border/30 py-10 text-center px-6">
+        <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-muted-foreground/50">
+          2026 Regimen AI
         </p>
       </footer>
     </div>

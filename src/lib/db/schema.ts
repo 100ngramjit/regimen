@@ -19,7 +19,7 @@ export const workouts = pgTable('workouts', {
 
 export const userStates = pgTable('user_states', {
   userId: varchar('user_id', { length: 255 }).notNull().references(() => users.id),
-  key: varchar('key', { length: 255 }).notNull(),
+  key: text('key').notNull(),
   value: text('value').notNull(), // JSON string
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({

@@ -7,10 +7,11 @@ import {
   ChevronDown,
   Moon,
   Zap,
+  Dumbbell,
+  Timer,
+  Repeat,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import PlanActions from "@/components/PlanActions";
 
@@ -19,171 +20,155 @@ interface Props {
   onRegenerate: () => void;
 }
 
-const DAY_STYLE = {
-  rest: {
-    text: "text-muted-foreground",
-    badge: "bg-muted text-muted-foreground border-border",
-    border: "border-border/30",
-    accent: "text-muted-foreground",
-    bg: "bg-muted/5",
-  },
-  active: {
-    text: "text-primary",
-    badge: "bg-primary/10 text-primary border-primary/20",
-    border: "border-primary/20",
-    accent: "text-primary",
-    bg: "bg-primary/5",
-  },
-} as const;
+const FOCUS_COLORS: Record<string, string> = {
+  Rest: "bg-muted text-muted-foreground border-border/40",
+  Push: "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800/30",
+  Pull: "bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800/30",
+  Legs: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800/30",
+  "Full Body": "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/30",
+  "Upper Body": "bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800/30",
+  "Lower Body": "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/30",
+  Core: "bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800/30",
+  Cardio: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/30 dark:text-pink-300 dark:border-pink-800/30",
+  Arms: "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800/30",
+  Back: "bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-300 dark:border-cyan-800/30",
+  Chest: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800/30",
+  Shoulders: "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-300 dark:border-yellow-800/30",
+  Glutes: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/30",
+};
 
-type StyleEntry = (typeof DAY_STYLE)["active"] | (typeof DAY_STYLE)["rest"];
-
-function getDayStyle(isRest: boolean): StyleEntry {
-  return isRest ? DAY_STYLE.rest : DAY_STYLE.active;
+function FocusBadge({ focus }: { focus: string }) {
+  const color = FOCUS_COLORS[focus] || FOCUS_COLORS.Rest;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold",
+        color,
+      )}
+    >
+      {focus}
+    </span>
+  );
 }
 
 function DayCard({ day }: { day: DayWorkout }) {
   const [expanded, setExpanded] = useState(false);
-  const style = getDayStyle(day.isRest);
 
   if (day.isRest) {
     return (
-      <Card className="border-border/30 bg-muted/10 backdrop-blur-sm transition-all hover:bg-muted/20 opacity-80">
-        <CardContent className="flex items-center justify-between p-6">
-          <div className="flex items-center gap-6">
-            <span className="w-20 text-xs font-black uppercase tracking-widest text-muted-foreground/60">
+      <div className="rounded-xl border border-dashed border-border/40 bg-muted/10 px-5 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-20">
               {day.day}
             </span>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-border/40 bg-background/50">
-              <Moon size={14} className="text-muted-foreground/60" />
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                Neural Recovery
-              </span>
-            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-0.5 text-[11px] font-medium text-muted-foreground">
+              <Moon size={12} />
+              Recovery
+            </span>
           </div>
-          <Moon size={20} className="text-muted-foreground/20 animate-pulse" />
-        </CardContent>
-      </Card>
+          <Moon size={16} className="text-muted-foreground/20" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card
+    <div
       className={cn(
-        "overflow-hidden transition-all duration-500",
+        "rounded-xl border transition-all duration-300",
         expanded
-          ? "border-primary/30 ring-1 ring-primary/10 shadow-2xl scale-[1.01]"
-          : "border-border/30 bg-card/40 hover:bg-card/60 backdrop-blur-sm",
+          ? "border-primary/20 bg-card shadow-lg"
+          : "border-border/50 bg-card/40 hover:border-border/80 hover:bg-card/60",
       )}
     >
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between px-6 py-6 text-left group"
+        className="flex w-full items-center justify-between px-5 py-4 text-left cursor-pointer"
       >
-        <div className="flex flex-wrap items-center gap-4 sm:gap-8">
-          <span className="w-20 text-xs font-black uppercase tracking-widest text-foreground/80 group-hover:text-foreground transition-colors">
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-20">
             {day.day}
           </span>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <span
-              className={cn(
-                "rounded-lg px-3 py-1 text-xs font-black uppercase tracking-[0.15em] border shadow-sm",
-                style.badge,
-              )}
-            >
-              {day.focus}
+          <FocusBadge focus={day.focus} />
+          {day.workout && (
+            <span className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground/60">
+              <Clock size={12} className="text-primary/60" />
+              {day.workout.totalTime}m
             </span>
-            {day.workout && (
-              <span className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/70">
-                <Clock size={14} className="text-primary" />{" "}
-                {day.workout.totalTime}m
-              </span>
-            )}
-          </div>
-        </div>
-        <span
-          className={cn(
-            "transition-transform duration-500 flex items-center justify-center h-8 w-8 rounded-full border border-border/40 group-hover:bg-muted/20",
-            style.accent,
-            expanded ? "rotate-180" : "",
           )}
-        >
-          <ChevronDown size={18} />
-        </span>
+        </div>
+        <ChevronDown
+          size={16}
+          className={cn(
+            "text-muted-foreground/40 transition-transform duration-300",
+            expanded && "rotate-180",
+          )}
+        />
       </button>
 
       <AnimatePresence>
         {expanded && day.workout && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className="overflow-hidden"
           >
-            <div className="border-t border-border/10 bg-muted/10 p-4 sm:p-8 space-y-12">
+            <div className="border-t border-border/20 px-5 py-5 space-y-6">
               {day.workout.sections.map((section, si) => (
-                <div key={si} className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <h4
-                      className={cn(
-                        "text-xs font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-border/20 bg-background/50",
-                        style.accent,
-                      )}
-                    >
-                      {section.name}
-                    </h4>
-                    <Separator className="flex-1 opacity-10" />
-                  </div>
+                <div key={si} className="space-y-3">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                    {section.name}
+                  </h4>
 
-                  <div className="grid gap-4">
+                  <div className="space-y-2">
                     {section.exercises.map((ex, ei) => (
                       <div
                         key={ei}
-                        className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border/20 bg-background/60 p-5 transition-all hover:border-primary/20 hover:shadow-lg overflow-hidden"
+                        className="group flex items-start justify-between gap-3 rounded-lg border border-border/30 bg-background/40 px-4 py-3 transition-all hover:border-primary/20 hover:bg-background/60"
                       >
-                        <div className="absolute inset-y-0 left-0 w-1 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="space-y-1.5">
-                          <p className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-                            <span className="h-6 w-6 flex items-center justify-center rounded bg-primary text-primary-foreground text-xs font-black border border-primary/20 shadow-lg shadow-primary/10">
-                              {ei + 1}
-                            </span>
-                            {ex.name}
-                          </p>
-                          {ex.instructions && (
-                            <p className="text-sm leading-relaxed text-foreground/90 max-w-md italic pl-8">
-                              {ex.instructions}
+                        <div className="flex items-start gap-3 min-w-0">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary border border-primary/20">
+                            {ei + 1}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">
+                              {ex.name}
                             </p>
-                          )}
+                            {ex.instructions && (
+                              <p className="mt-0.5 text-xs text-muted-foreground/70 leading-relaxed">
+                                {ex.instructions}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex shrink-0 flex-col items-end gap-3 pl-8 sm:pl-0">
-                          <div className="flex gap-2">
+
+                        <div className="flex shrink-0 flex-col items-end gap-1.5">
+                          <div className="flex items-center gap-1.5">
                             {ex.sets && (
-                              <span
-                                className={cn(
-                                  "rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-widest border shadow-md bg-foreground text-background",
-                                  style.border,
-                                )}
-                              >
-                                {ex.sets} SETS
+                              <span className="inline-flex items-center gap-1 rounded-md bg-foreground/10 px-2 py-0.5 text-[10px] font-semibold text-foreground">
+                                <Repeat size={10} className="opacity-70" />
+                                {ex.sets}
                               </span>
                             )}
-                            {(ex.reps || ex.duration) && (
-                              <span
-                                className={cn(
-                                  "rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-widest border shadow-md",
-                                  style.badge,
-                                )}
-                              >
-                                {ex.reps || ex.duration}
+                            {ex.reps && (
+                              <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                <Dumbbell size={10} className="opacity-70" />
+                                {ex.reps}
+                              </span>
+                            )}
+                            {ex.duration && (
+                              <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                                <Timer size={10} className="opacity-70" />
+                                {ex.duration}
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 font-bold text-foreground/70">
-                            <Clock size={14} className="text-primary" />
-                            <span className="text-xs uppercase tracking-widest">
-                              Rest: {ex.rest}
-                            </span>
-                          </div>
+                          <span className="text-[10px] text-muted-foreground/50">
+                            Rest {ex.rest}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -194,84 +179,70 @@ function DayCard({ day }: { day: DayWorkout }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </Card>
+    </div>
   );
 }
 
-export default function WeeklyPlanDisplay({
-  plan,
-  onRegenerate,
-}: Props) {
+export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
   const activeDays = plan.days.filter((d) => !d.isRest).length;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 max-w-2xl mx-auto w-full px-2 sm:px-0"
+      className="space-y-8 w-full"
     >
-      {/* Header */}
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-border/40 bg-muted/20 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground shadow-sm">
-          <Zap size={14} className="text-primary fill-primary" />
-          <span className="text-primary">{activeDays} Training Days</span>
-          <Separator orientation="vertical" className="h-4" />
-          <span className="opacity-70">{plan.goal}</span>
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-sm">
+          <Zap size={13} className="fill-primary/30" />
+          <span>{activeDays} Training Days</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground/70">{plan.goal}</span>
         </div>
-        <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
           {plan.weekTitle}
         </h2>
-
-        <PlanActions
-          onRegenerate={onRegenerate}
-          exportData={{ type: "weekly", plan }}
-        />
+        <div className="flex justify-center pt-1">
+          <PlanActions
+            onRegenerate={onRegenerate}
+            exportData={{ type: "weekly", plan }}
+          />
+        </div>
       </div>
 
-      <Separator className="bg-border/40" />
-
-      {/* Week strip */}
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="grid grid-cols-7 gap-1.5">
         {plan.days.map((d) => {
-          const style = getDayStyle(d.isRest);
+          const isActive = !d.isRest;
           return (
             <div
               key={d.day}
               className={cn(
-                "flex flex-col items-center gap-2 rounded-xl py-4 transition-all border group",
-                d.isRest
-                  ? "opacity-30 border-transparent bg-muted/10"
-                  : "border-primary/10 bg-card shadow-sm hover:border-primary/30 hover:scale-[1.05]",
+                "flex flex-col items-center gap-1.5 rounded-lg py-3 transition-all",
+                isActive
+                  ? "bg-card/50 border border-border/40 shadow-sm"
+                  : "opacity-30",
               )}
             >
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-muted-foreground/60">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
                 {d.day.slice(0, 3)}
               </span>
               <div
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
-                  d.isRest ? "bg-muted-foreground/30" : "bg-primary",
+                  isActive ? "bg-primary" : "bg-muted-foreground/30",
                 )}
               />
-              <span
-                className={cn(
-                  "text-[10px] sm:text-xs font-black uppercase tracking-tighter hidden sm:block",
-                  style.text,
-                )}
-              >
-                {d.isRest
-                  ? "—"
-                  : d.focus.length > 5
-                    ? d.focus.split(" ")[0]
-                    : d.focus}
-              </span>
+              {isActive && (
+                <span className="text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
+                  {d.focus.length > 6 ? d.focus.split(" ")[0] : d.focus}
+                </span>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Day cards */}
-      <div className="grid gap-3">
+      <div className="space-y-2">
         {plan.days.map((d) => (
           <DayCard key={d.day} day={d} />
         ))}
