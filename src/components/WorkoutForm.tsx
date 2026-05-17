@@ -152,10 +152,10 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
               type="button"
               onClick={() => update("level", value)}
               className={cn(
-                "relative rounded-xl border px-3 py-3 text-center text-sm font-medium transition-all",
+                "relative rounded-2xl border px-3 py-3 text-center text-sm font-medium transition-all glass-light",
                 formData.level === value
-                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "border-border/60 bg-muted/30 text-muted-foreground hover:border-border hover:bg-muted/50",
+                  ? "border-primary bg-primary/15 text-primary shadow-md"
+                  : "hover:glass-hover",
               )}
             >
               {label}

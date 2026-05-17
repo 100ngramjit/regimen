@@ -57,22 +57,7 @@ const LEVELS: { value: FitnessLevel; label: string }[] = [
   { value: "advanced", label: "Advanced" },
 ];
 
-const FOCUS_COLORS: Record<string, string> = {
-  Push: "bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800/30",
-  Pull: "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800/30",
-  Legs: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/30",
-  "Full Body": "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800/30",
-  "Upper Body": "bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-300 dark:border-sky-800/30",
-  "Lower Body": "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800/30",
-  Core: "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/20 dark:text-teal-300 dark:border-teal-800/30",
-  Cardio: "bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800/30",
-  Arms: "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800/30",
-  Back: "bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800/30",
-  Chest: "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800/30",
-  Shoulders: "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800/30",
-  Glutes: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800/30",
-  Rest: "bg-muted text-muted-foreground border-border/40",
-};
+
 
 export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
   const [goal, setGoal] = useDbState("regimen:form:weekly:goal", "muscle gain");
@@ -143,7 +128,7 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
         ].map((s, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border/60 bg-card/40 px-3 py-4 text-center"
+            className="rounded-2xl glass px-3 py-4 text-center"
           >
             <s.icon size={15} className="mx-auto mb-1.5 text-primary/70" />
             <div className="text-xl font-bold tabular-nums text-foreground">{s.value}</div>
@@ -160,17 +145,14 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
           Weekly Schedule
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1.5">
           {schedule.map((d) => {
-            const focusColor = FOCUS_COLORS[d.focus] || FOCUS_COLORS.Rest;
             return (
               <div
                 key={d.day}
                 className={cn(
-                  "rounded-xl border p-3 transition-all duration-200",
-                  d.isRest
-                    ? "border-dashed border-border/40 bg-muted/20"
-                    : "border-border/60 bg-card/40 shadow-sm",
+                  "rounded-2xl glass-light p-3 transition-all duration-200",
+                  d.isRest ? "border-dashed" : "",
                 )}
               >
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2 text-center">
@@ -287,10 +269,10 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
                 type="button"
                 onClick={() => setLevel(value)}
                 className={cn(
-                  "rounded-lg border px-2 py-2 text-xs font-medium text-center transition-all cursor-pointer",
+                  "rounded-xl border px-2 py-2 text-xs font-medium text-center transition-all cursor-pointer glass-light",
                   level === value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border/60 bg-muted/30 text-muted-foreground hover:border-border",
+                    ? "border-primary bg-primary/15 text-primary shadow-md"
+                    : "hover:glass-hover",
                 )}
               >
                 {label}

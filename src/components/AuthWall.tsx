@@ -66,7 +66,7 @@ export default function AuthWall() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
-                className="rounded-lg border border-border/40 bg-card/40 p-3 sm:p-5 backdrop-blur-sm"
+                className="rounded-xl glass-light p-3 sm:p-5"
               >
                 <div className="flex gap-3 sm:gap-4">
                   <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

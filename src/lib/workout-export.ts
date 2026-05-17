@@ -267,70 +267,37 @@ function downloadTextFile(filename: string, content: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
-function printHtml(html: string) {
-  const iframe = document.createElement("iframe");
-  iframe.style.position = "fixed";
-  iframe.style.right = "0";
-  iframe.style.bottom = "0";
-  iframe.style.width = "0";
-  iframe.style.height = "0";
-  iframe.style.border = "0";
-  iframe.name = "print_frame";
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentWindow?.document;
-  if (!doc) {
-    downloadTextFile("regimen-workout.html", html, "text/html;charset=utf-8");
-    return;
-  }
-
-  doc.open();
-  doc.write(html);
-  doc.close();
-
-  const handlePrint = () => {
-    iframe.contentWindow?.focus();
-    iframe.contentWindow?.print();
-    setTimeout(() => {
-      if (document.body.contains(iframe)) {
-        document.body.removeChild(iframe);
-      }
-    }, 1000);
-  };
-
-  if (iframe.contentWindow) {
-    iframe.onload = handlePrint;
-    setTimeout(handlePrint, 500);
-  } else {
-    handlePrint();
-  }
-}
-
 export function exportPlan(plan: ExportPlan, format: ExportFormat) {
-  if (format === "sheets") {
-    downloadTextFile(
-      getExportFilename(plan, format),
-      toCsv(plan),
-      "text/csv;charset=utf-8",
-    );
-    return;
+  try {
+    if (format === "sheets") {
+      downloadTextFile(
+        getExportFilename(plan, format),
+        toCsv(plan),
+        "text/csv;charset=utf-8",
+      );
+      return;
+    }
+
+    if (format === "md") {
+      downloadTextFile(
+        getExportFilename(plan, format),
+        toMarkdown(plan),
+        "text/markdown;charset=utf-8",
+      );
+      return;
+    }
+
+    const html = toHtml(plan);
+
+    if (format === "pdf") {
+      const filename = getExportFilename(plan, "html").replace(".html", ".html");
+      downloadTextFile(filename, html, "text/html;charset=utf-8");
+      return;
+    }
+
+    downloadTextFile(getExportFilename(plan, format), html, "text/html;charset=utf-8");
+  } catch (err) {
+    console.error("Export failed:", err);
+    alert("Export failed. Please try again.");
   }
-
-  if (format === "md") {
-    downloadTextFile(
-      getExportFilename(plan, format),
-      toMarkdown(plan),
-      "text/markdown;charset=utf-8",
-    );
-    return;
-  }
-
-  const html = toHtml(plan);
-
-  if (format === "pdf") {
-    printHtml(html);
-    return;
-  }
-
-  downloadTextFile(getExportFilename(plan, format), html, "text/html;charset=utf-8");
 }

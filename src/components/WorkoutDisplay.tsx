@@ -12,6 +12,7 @@ import {
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import PlanActions from "@/components/PlanActions";
+import ExportMenu from "@/components/ExportMenu";
 
 interface Props {
   workout: Workout;
@@ -36,25 +37,25 @@ function ExerciseCard({
   instructions?: string | null;
 }) {
   return (
-    <div className="group relative rounded-xl border border-border/50 bg-card/30 p-5 transition-all hover:border-primary/20 hover:bg-card/50 hover:shadow-md">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3 min-w-0">
+    <div className="group relative rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-4 sm:p-5 transition-all hover:border-primary/20 hover:bg-card/60 hover:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.3)] max-w-full">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+        <div className="flex items-start gap-3 min-w-0 w-full sm:w-auto">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary border border-primary/20">
             {number}
           </span>
-          <div className="min-w-0">
-            <h4 className="text-base font-semibold text-foreground truncate">
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm sm:text-base font-semibold text-foreground break-words">
               {name}
             </h4>
             {instructions && (
-              <p className="mt-1 text-sm text-muted-foreground/80 leading-relaxed">
+              <p className="mt-1 text-sm text-muted-foreground/80 leading-relaxed break-words">
                 {instructions}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-2">
+        <div className="flex shrink-0 flex-col items-end gap-2 w-full sm:w-auto">
           <div className="flex flex-wrap items-center gap-2 justify-end">
             {sets && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-foreground/10 px-2.5 py-1 text-[11px] font-semibold text-foreground border border-foreground/10">
@@ -69,7 +70,7 @@ function ExerciseCard({
               </span>
             )}
             {duration && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary border border-primary/20">
                 <Timer size={12} className="opacity-70" />
                 {duration}
               </span>
@@ -93,26 +94,24 @@ export default function WorkoutDisplay({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 w-full"
+      className="space-y-8 sm:space-y-10 w-full max-w-full overflow-hidden"
     >
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-sm">
-          <Clock size={13} />
-          {workout.totalTime} Minutes
+      <div className="text-center space-y-3 px-2 sm:px-0">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-sm px-3 sm:px-4 py-1.5 text-xs font-semibold text-primary shadow-[0_4px_16px_-4px_rgba(172,189,186,0.15)] max-w-full">
+          <Clock size={13} className="shrink-0" />
+          <span className="truncate">{workout.totalTime} Minutes</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground break-words px-1">
           {workout.title}
         </h2>
 
-        <div className="flex items-center justify-center gap-3 pt-2">
-          <PlanActions
-            onRegenerate={onRegenerate}
-            exportData={{ type: "single", workout }}
-          />
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <PlanActions onRegenerate={onRegenerate} />
+          <ExportMenu plan={{ type: "single", workout }} />
         </div>
       </div>
 
-      <div className="space-y-12">
+      <div className="space-y-8 sm:space-y-12 max-w-full">
         {workout.sections.map((section, si) => (
           <div key={si} className="space-y-4">
             <div className="flex items-center gap-3">

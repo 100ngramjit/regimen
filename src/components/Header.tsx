@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { CalendarDays, Dumbbell, Zap } from "lucide-react";
+import { CalendarDays, Dumbbell, Zap, History } from "lucide-react";
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import {
   DropdownMenu,
@@ -16,7 +16,7 @@ export default async function Header() {
   const { user } = await withAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 backdrop-blur-[2px]">
+    <header className="sticky top-0 z-50 w-full bg-transparent backdrop-blur-xs">
       <div className="max-w-4xl mx-auto flex h-16 items-center justify-between px-5 sm:px-6">
         <Link
           href="/"
@@ -46,6 +46,13 @@ export default async function Header() {
               <Zap size={13} />
               Session
             </Link>
+            <Link
+              href="/history"
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <History size={13} />
+              History
+            </Link>
           </nav>
         )}
 
@@ -62,9 +69,7 @@ export default async function Header() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-56 mt-2 border-border/50 bg-background/95 backdrop-blur-xl"
-              >
+              <DropdownMenuContent className="w-56 mt-2 glass-darker">
                 <DropdownMenuLabel className="flex flex-col">
                   <span className="text-xs font-black uppercase tracking-wider">
                     {user.firstName} {user.lastName}
@@ -88,6 +93,14 @@ export default async function Header() {
                     className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
                   >
                     Single session
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href="/history"
+                    className="text-xs font-bold uppercase tracking-wider cursor-pointer focus:bg-primary/5 focus:text-primary"
+                  >
+                    History
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border/50" />

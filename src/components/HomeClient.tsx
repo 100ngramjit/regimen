@@ -187,10 +187,10 @@ export default function HomeClient({ mode }: HomeClientProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 px-4 sm:px-6 py-6 md:py-10">
-        <div className="max-w-6xl mx-auto space-y-8">
+      <main className="flex-1 px-4 sm:px-6 py-6 md:py-10 w-full max-w-full overflow-x-hidden">
+        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 w-full">
           {/* Mode switcher */}
-          <div className="flex items-center justify-center gap-1 rounded-xl border border-border/40 bg-card/30 p-1 w-fit mx-auto shadow-sm">
+          <div className="flex items-center justify-center gap-1 rounded-2xl glass-pop p-1 w-fit mx-auto">
             {MODE_LINKS.map((m) => {
               const Icon = m.icon;
               const isActive = mode === m.value;
@@ -229,9 +229,9 @@ export default function HomeClient({ mode }: HomeClientProps) {
 
           {/* Loading skeleton */}
           {isInitialLoading ? (
-            <div className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start">
-              <Card className="border-border/40 shadow-sm">
-                <CardContent className="p-8 space-y-6">
+            <div className="grid gap-6 sm:gap-8 xl:grid-cols-[1fr_300px] xl:items-start w-full">
+              <Card className="border-border/40 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.3)] w-full">
+                <CardContent className="p-4 sm:p-6 md:p-8 space-y-6">
                   <div className="h-8 w-1/3 animate-pulse rounded-lg bg-muted/30" />
                   <div className="h-5 w-2/3 animate-pulse rounded-lg bg-muted/20" />
                   <div className="h-40 w-full animate-pulse rounded-xl bg-muted/10" />
@@ -239,7 +239,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                 </CardContent>
               </Card>
               <aside className="space-y-4">
-                <div className="rounded-xl border border-border/40 bg-muted/20 p-5 space-y-3">
+                    <div className="rounded-xl glass-hover p-5 space-y-3">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                     <Hammer size={14} className="text-primary animate-spin" />
                     Loading...
@@ -255,7 +255,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
               {showForm && (
                 <section
                   id="composer"
-                  className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start"
+                  className="grid gap-6 sm:gap-8 xl:grid-cols-[1fr_300px] xl:items-start w-full"
                 >
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -265,8 +265,8 @@ export default function HomeClient({ mode }: HomeClientProps) {
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-border/40 shadow-sm">
-                        <CardContent className="p-6 sm:p-8">
+<Card className="glass-pop">
+                        <CardContent className="p-4 sm:p-6 md:p-8">
                           <div className="mb-8">
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                               {mode === "weekly"
@@ -300,7 +300,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                   </AnimatePresence>
 
                   <aside className="space-y-4">
-                    <div className="rounded-xl border border-border/40 bg-card/30 p-5 space-y-3">
+                    <div className="rounded-2xl glass-hover p-5 space-y-3">
                       <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                         <Hammer size={14} className="text-primary" />
                         {isReforging ? "Refining" : "Ready"}
@@ -312,7 +312,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                       </p>
                     </div>
                     <UsageCard usage={usage} isLoading={isLoadingUsage} />
-                    <div className="rounded-xl border border-border/40 bg-card/30 p-5 space-y-3">
+                    <div className="rounded-2xl glass p-5 space-y-3">
                       <p className="text-xs font-semibold text-muted-foreground">
                         Pro Tips
                       </p>
@@ -337,14 +337,15 @@ export default function HomeClient({ mode }: HomeClientProps) {
 
               {/* Result */}
               {showResult && (
-                <section className="grid gap-8 xl:grid-cols-[1fr_300px] xl:items-start">
+                <section className="grid gap-6 sm:gap-8 xl:grid-cols-[1fr_300px] xl:items-start w-full">
                   <motion.div
                     id="result"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    className="w-full min-w-0"
                   >
-                    <Card className="border-primary/10 shadow-md ring-1 ring-primary/5">
-                      <CardContent className="p-6 sm:p-8">
+                    <Card className="glass-pop border-primary/10 w-full">
+                      <CardContent className="p-4 sm:p-6 md:p-8">
                         {mode === "weekly" && weeklyPlan ? (
                           <WeeklyPlanDisplay
                             plan={weeklyPlan}

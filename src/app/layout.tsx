@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexSerif.variable} dark`} suppressHydrationWarning>
-      <body className="antialiased font-sans bg-background text-foreground">
+        <body className="antialiased font-sans bg-background text-foreground overflow-x-hidden">
         <Header />
         {children}
       </body>

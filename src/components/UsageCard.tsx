@@ -11,7 +11,7 @@ interface UsageCardProps {
 
 export default function UsageCard({ usage, isLoading }: UsageCardProps) {
   return (
-    <div className="rounded-lg border border-border/40 bg-card/35 p-5 backdrop-blur-sm">
+    <div className="rounded-xl glass-light p-5">
       <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
         <Zap size={15} className="text-primary" />
         Daily Allowance

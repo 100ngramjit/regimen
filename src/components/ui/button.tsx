@@ -23,12 +23,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
           {
-            "bg-primary text-primary-foreground shadow hover:opacity-90": variant === "default",
+            "bg-primary text-primary-foreground shadow-[0_4px_16px_-4px_rgba(172,189,186,0.3)] hover:opacity-90": variant === "default",
             "bg-red-600 text-white shadow-sm hover:bg-red-700": variant === "destructive",
             "border border-red-600 text-red-600 hover:bg-red-50": variant === "destructive-outline",
-            "hover:bg-muted hover:text-foreground": variant === "ghost",
+            "hover:bg-card/70 hover:text-foreground": variant === "ghost",
             "text-primary underline-offset-4 hover:underline": variant === "link",
-            "border border-border bg-background shadow-sm hover:bg-muted hover:text-foreground": variant === "outline",
+            "border border-border/50 bg-card/60 backdrop-blur-sm shadow-sm hover:bg-card/80 hover:text-foreground": variant === "outline",
             "bg-secondary text-secondary-foreground shadow-sm hover:opacity-80": variant === "secondary",
           },
           {
