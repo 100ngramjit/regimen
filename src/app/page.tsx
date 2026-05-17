@@ -1,13 +1,8 @@
+import LandingPage from '@/components/landing/LandingPage';
 import { withAuth } from '@workos-inc/authkit-nextjs';
-import AuthWall from '@/components/AuthWall';
-import { redirect } from 'next/navigation';
 
 export default async function Home() {
-  const { user } = await withAuth();
+  const { user } = await withAuth({ ensureSignedIn: false });
 
-  if (!user) {
-    return <AuthWall />;
-  }
-
-  redirect('/weekly');
+  return <LandingPage isAuthenticated={!!user} />;
 }

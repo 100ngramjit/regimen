@@ -27,7 +27,7 @@ export const AnimatedShinyText: FC<AnimatedShinyTextProps> = ({
         "inline-block bg-clip-text text-transparent",
 
         // Multiple backgrounds: Shimmer (layer 0) and Base Gradient (layer 1)
-        "bg-[linear-gradient(110deg,transparent,35%,rgba(255,255,255,0.95),50%,rgba(255,255,255,0.95),65%,transparent),linear-gradient(to_right,var(--muted-foreground),var(--primary))]",
+        "bg-[linear-gradient(110deg,transparent,35%,rgba(255,255,255,1),50%,rgba(255,255,255,1),65%,transparent),linear-gradient(to_right,var(--muted-foreground),var(--primary))]",
 
         // Background settings
         "bg-no-repeat",

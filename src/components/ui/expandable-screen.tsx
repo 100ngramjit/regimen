@@ -43,6 +43,7 @@ interface ExpandableScreenProps {
   contentRadius?: string;
   animationDuration?: number;
   defaultExpanded?: boolean;
+  expanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
   lockScroll?: boolean;
 }
@@ -54,20 +55,23 @@ export function ExpandableScreen({
   contentRadius = "24px",
   animationDuration = 0.3,
   defaultExpanded = false,
+  expanded: controlledExpanded,
   onExpandChange,
   lockScroll = true,
 }: ExpandableScreenProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const isControlled = controlledExpanded !== undefined;
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const isExpanded = isControlled ? controlledExpanded : internalExpanded;
 
   const expand = useCallback(() => {
-    setIsExpanded(true);
+    if (!isControlled) setInternalExpanded(true);
     onExpandChange?.(true);
-  }, [onExpandChange]);
+  }, [isControlled, onExpandChange]);
 
   const collapse = useCallback(() => {
-    setIsExpanded(false);
+    if (!isControlled) setInternalExpanded(false);
     onExpandChange?.(false);
-  }, [onExpandChange]);
+  }, [isControlled, onExpandChange]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -149,13 +153,8 @@ export function ExpandableScreenContent({
   showCloseButton?: boolean;
   closeButtonClassName?: string;
 }) {
-  const {
-    isExpanded,
-    collapse,
-    layoutId,
-    contentRadius,
-    animationDuration,
-  } = useExpandableScreen();
+  const { isExpanded, collapse, layoutId, contentRadius, animationDuration } =
+    useExpandableScreen();
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -183,11 +182,11 @@ export function ExpandableScreenContent({
                 ease: [0.23, 1, 0.32, 1],
               }}
               className={cn(
-                  "relative w-full max-w-4xl mx-auto mt-8 mb-8 will-change-transform transform-gpu",
-                  "bg-card/80 backdrop-blur-2xl border border-border/50 shadow-[0_8px_40px_-16px_rgba(0,0,0,0.5)]",
-                  className,
-                )}
-              >
+                "relative w-full max-w-4xl mx-auto mt-8 mb-8 will-change-transform transform-gpu",
+                "bg-card/80 backdrop-blur-2xl border border-border/50 shadow-[0_8px_40px_-16px_rgba(0,0,0,0.5)]",
+                className,
+              )}
+            >
               {showCloseButton && (
                 <button
                   onClick={collapse}
@@ -208,7 +207,7 @@ export function ExpandableScreenContent({
         </>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }
 
@@ -222,9 +221,5 @@ export function ExpandableScreenBackground({
   className?: string;
 }) {
   const { isExpanded } = useExpandableScreen();
-  return (
-    <div className={className}>
-      {isExpanded ? content : trigger}
-    </div>
-  );
+  return <div className={className}>{isExpanded ? content : trigger}</div>;
 }

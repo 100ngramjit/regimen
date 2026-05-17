@@ -11,24 +11,29 @@ interface UsageCardProps {
 
 export default function UsageCard({ usage, isLoading }: UsageCardProps) {
   return (
-    <div className="rounded-xl glass-light p-5">
-      <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-        <Zap size={15} className="text-primary" />
-        Daily Allowance
+    <div className="rounded-xl glass-light p-3.5">
+      <div className="mb-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
+          <Zap size={13} className="text-primary" />
+          Daily Allowance
+        </div>
+        <span className="text-[8px] font-extrabold uppercase tracking-wider text-muted-foreground/40">
+          Resets at midnight
+        </span>
       </div>
       {isLoading ? (
-        <div className="h-6 w-1/2 animate-pulse rounded-md bg-muted/30" />
+        <div className="h-5 w-1/3 animate-pulse rounded bg-muted/30" />
       ) : (
-        <div className="space-y-2">
-          <div className="flex items-end gap-2">
-            <span className="text-3xl font-black tracking-tight text-primary">
+        <div className="space-y-1.5">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-black tracking-tight text-primary">
               {usage?.remaining ?? 0}
             </span>
-            <span className="mb-1 text-xs font-bold text-muted-foreground">
-              OF {usage?.limit ?? 2} LEFT
+            <span className="text-[9px] font-extrabold text-muted-foreground uppercase tracking-wider">
+              of {usage?.limit ?? 2} left
             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-muted/30">
             <motion.div
               initial={{ width: 0 }}
               animate={{
@@ -37,9 +42,6 @@ export default function UsageCard({ usage, isLoading }: UsageCardProps) {
               className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]"
             />
           </div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-            Resets at midnight
-          </p>
         </div>
       )}
     </div>

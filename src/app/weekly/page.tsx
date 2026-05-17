@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { withAuth } from "@workos-inc/authkit-nextjs";
+import { redirect } from "next/navigation";
 import PlannerPage from "@/components/PlannerPage";
 
 export const metadata: Metadata = {
@@ -6,6 +8,12 @@ export const metadata: Metadata = {
   description: "Build a complete AI-generated weekly training plan.",
 };
 
-export default function WeeklyPage() {
+export default async function WeeklyPage() {
+  const { user } = await withAuth({ ensureSignedIn: false });
+
+  if (!user) {
+    redirect("/api/auth/login");
+  }
+
   return <PlannerPage mode="weekly" />;
 }

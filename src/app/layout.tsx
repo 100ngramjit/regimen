@@ -16,18 +16,18 @@ const ibmPlexSerif = IBM_Plex_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Regimen AI — Precision Training Protocols",
-  description: "Generate hyper-personalized AI workout plans and complete weekly training programs. Free, fast, and tailored to your goals.",
+  title: "Regimen — The Energy Architecture Atelier",
+  description: "Where precision meets intention. Bespoke training protocols, architected for those who accept nothing less than exacting.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexSerif.variable} dark`} suppressHydrationWarning>
-        <body className="antialiased font-sans bg-background text-foreground overflow-x-hidden">
+      <body className="antialiased font-sans bg-background text-foreground overflow-x-hidden">
         <Header />
         {children}
       </body>
