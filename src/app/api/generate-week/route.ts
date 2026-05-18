@@ -288,6 +288,7 @@ ${validatedData.schedule.map(d => `- ${d.day}: ${d.isRest ? 'REST DAY' : `${d.fo
 
 For each active training day, generate a tailored workout matching the focus muscle group AND the specified duration for that day.
 Rest days should have workout: null.
+Each exercise must have detailed instructions following this format: "Setup: ... Execution: ... Breathing: ... Tip: ...".
 
 Return a JSON object exactly matching this schema:
 {
@@ -311,7 +312,7 @@ Return a JSON object exactly matching this schema:
                 "duration": "string or null",
                 "reps": "string or null",
                 "rest": "string",
-                "instructions": "string or null"
+                "instructions": "Setup: ... Execution: ... Breathing: ... Tip: ..."
               }
             ]
           }

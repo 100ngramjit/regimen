@@ -207,9 +207,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                 >
                   <Icon size={16} />
                   <span className="hidden sm:inline">{m.label}</span>
-                  <span className="sm:hidden">
-                    {m.label.split(" ")[0]}
-                  </span>
+                  <span className="sm:hidden">{m.label.split(" ")[0]}</span>
                 </Link>
               );
             })}
@@ -239,7 +237,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                 </CardContent>
               </Card>
               <aside className="space-y-4">
-                    <div className="rounded-xl glass-hover p-5 space-y-3">
+                <div className="rounded-xl glass-hover p-5 space-y-3">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                     <Hammer size={14} className="text-primary animate-spin" />
                     Loading...
@@ -265,7 +263,7 @@ export default function HomeClient({ mode }: HomeClientProps) {
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.2 }}
                     >
-<Card className="glass-pop">
+                      <Card className="glass-pop">
                         <CardContent className="p-4 sm:p-6 md:p-8">
                           <div className="mb-8">
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">

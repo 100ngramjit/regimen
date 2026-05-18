@@ -2,17 +2,12 @@
 
 import React from "react";
 import { Workout } from "@/lib/schemas";
-import {
-  Clock,
-  CheckCircle2,
-  Dumbbell,
-  Timer,
-  Repeat,
-} from "lucide-react";
+import { Clock, CheckCircle2, Dumbbell, Timer, Repeat } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import PlanActions from "@/components/PlanActions";
 import ExportMenu from "@/components/ExportMenu";
+import ExerciseInstructions from "@/components/ExerciseInstructions";
 
 interface Props {
   workout: Workout;
@@ -37,7 +32,7 @@ function ExerciseCard({
   instructions?: string | null;
 }) {
   return (
-    <div className="group relative rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-4 sm:p-5 transition-all hover:border-primary/20 hover:bg-card/60 hover:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.3)] max-w-full">
+    <div className="group relative overflow-hidden rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-4 sm:p-5 transition-all hover:border-primary/20 hover:bg-card/60 hover:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.3)] max-w-full">
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
         <div className="flex items-start gap-3 min-w-0 w-full sm:w-auto">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary border border-primary/20">
@@ -48,9 +43,7 @@ function ExerciseCard({
               {name}
             </h4>
             {instructions && (
-              <p className="mt-1 text-sm text-muted-foreground/80 leading-relaxed break-words">
-                {instructions}
-              </p>
+              <ExerciseInstructions instructions={instructions} />
             )}
           </div>
         </div>
@@ -86,10 +79,7 @@ function ExerciseCard({
   );
 }
 
-export default function WorkoutDisplay({
-  workout,
-  onRegenerate,
-}: Props) {
+export default function WorkoutDisplay({ workout, onRegenerate }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

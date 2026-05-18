@@ -6,7 +6,9 @@ import { Clock, Moon, Zap, Dumbbell, Timer, Repeat } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import PlanActions from "@/components/PlanActions";
+import { BorderBeam } from "@/components/ui/border-beam";
 import ExportMenu from "@/components/ExportMenu";
+import ExerciseInstructions from "@/components/ExerciseInstructions";
 import {
   ExpandableScreen,
   ExpandableScreenTrigger,
@@ -48,7 +50,7 @@ function ExerciseList({ day }: { day: DayWorkout }) {
             {section.exercises.map((ex, ei) => (
               <div
                 key={ei}
-                className="group flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm px-3 sm:px-4 py-3 transition-all hover:border-primary/20 hover:bg-card/60 max-w-full"
+                className="group relative overflow-hidden flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm px-3 sm:px-4 py-3 transition-all hover:border-primary/20 hover:bg-card/60 max-w-full"
               >
                 <div className="flex items-start gap-3 min-w-0 w-full sm:w-auto">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary border border-primary/20">
@@ -59,9 +61,7 @@ function ExerciseList({ day }: { day: DayWorkout }) {
                       {ex.name}
                     </p>
                     {ex.instructions && (
-                      <p className="mt-0.5 text-xs text-muted-foreground/70 leading-relaxed break-words">
-                        {ex.instructions}
-                      </p>
+                      <ExerciseInstructions instructions={ex.instructions} />
                     )}
                   </div>
                 </div>
@@ -146,23 +146,32 @@ export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
               <ExpandableScreenTrigger>
                 <button
                   className={cn(
-                    "flex flex-col items-center gap-1 rounded-lg py-3 min-w-[3.5rem] transition-all backdrop-blur-sm",
+                    "group relative overflow-hidden flex flex-col items-center gap-1 rounded-lg py-3 min-w-[3.5rem] transition-all cursor-pointer",
                     isExpanded
                       ? "bg-card/80 border border-primary shadow-sm"
                       : isActive
-                        ? "bg-card/60 border border-primary/50"
+                        ? "bg-card/60 border border-primary/10"
                         : "opacity-40 bg-card/30 border border-border/30",
                   )}
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                  {isActive && (
+                    <BorderBeam
+                      size={40}
+                      duration={6}
+                      borderWidth={1}
+                      colorFrom="#172069ff"
+                      colorTo="#bdbdbdff"
+                    />
+                  )}
+                  <span className="relative z-10 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
                     {d.day.slice(0, 3)}
                   </span>
                   {isActive ? (
-                    <span className="text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
+                    <span className="relative z-10 text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
                       {d.focus.length > 6 ? d.focus.split(" ")[0] : d.focus}
                     </span>
                   ) : (
-                    <span className="text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
+                    <span className="relative z-10 text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
                       Rest
                     </span>
                   )}

@@ -100,6 +100,8 @@ Constraints:
 - Keep total duration within the requested limit.
 - Include Warm-up, Main Workout, and Cool-down sections.
 - Ensure exercises are appropriate for the user's level and equipment.
+- Each exercise must have detailed instructions following this format:
+  "Setup: How to set up for the exercise. Execution: How to perform the movement. Breathing: When to inhale and exhale. Tip: One key coaching cue."
 
 Schema:
 {
@@ -115,7 +117,7 @@ Schema:
           "duration": "e.g. 30s",
           "reps": "e.g. 10",
           "rest": "e.g. 15s",
-          "instructions": "Simple tip"
+          "instructions": "Setup: ... Execution: ... Breathing: ... Tip: ..."
         }
       ]
     }

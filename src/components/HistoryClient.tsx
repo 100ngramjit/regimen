@@ -15,6 +15,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Workout, WeeklyPlan, DayWorkout } from "@/lib/schemas";
 import ExportMenu from "@/components/ExportMenu";
+import { BorderBeam } from "@/components/ui/border-beam";
+import ExerciseInstructions from "@/components/ExerciseInstructions";
 import {
   ExpandableScreen,
   ExpandableScreenTrigger,
@@ -30,7 +32,8 @@ type WorkoutEntry = {
 };
 
 function focusBadgeClasses(focus: string) {
-  if (focus === "Rest") return "bg-muted text-muted-foreground border-border/40";
+  if (focus === "Rest")
+    return "bg-muted text-muted-foreground border-border/40";
   return "bg-primary/10 text-primary border-primary/20";
 }
 
@@ -115,9 +118,7 @@ function SessionDetail({ workout }: { workout: Workout }) {
                       {ex.name}
                     </p>
                     {ex.instructions && (
-                      <p className="mt-0.5 text-xs text-muted-foreground/70 leading-relaxed">
-                        {ex.instructions}
-                      </p>
+                      <ExerciseInstructions instructions={ex.instructions} />
                     )}
                   </div>
                 </div>
@@ -163,10 +164,7 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-          <CalendarDays
-            size={18}
-            className="text-primary"
-          />
+          <CalendarDays size={18} className="text-primary" />
         </div>
         <div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
@@ -223,7 +221,8 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
               </span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground/70">
-              Take time to rest and recover. Light stretching, walking, or yoga is encouraged.
+              Take time to rest and recover. Light stretching, walking, or yoga
+              is encouraged.
             </p>
           </div>
         ) : selectedDay.workout ? (
@@ -232,10 +231,12 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">
                 {selectedDay.day}
               </span>
-              <span className={cn(
-                "inline-flex items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold",
-                focusBadgeClasses(selectedDay.focus),
-              )}>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold",
+                  focusBadgeClasses(selectedDay.focus),
+                )}
+              >
                 {selectedDay.focus}
               </span>
               <span className="flex items-center gap-1 text-xs text-muted-foreground/50">
@@ -264,9 +265,7 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
                             {ex.name}
                           </p>
                           {ex.instructions && (
-                            <p className="mt-0.5 text-xs text-muted-foreground/70 leading-relaxed">
-                              {ex.instructions}
-                            </p>
+                            <ExerciseInstructions instructions={ex.instructions} />
                           )}
                         </div>
                       </div>
@@ -323,6 +322,13 @@ function WorkoutCard({ entry }: { entry: WorkoutEntry }) {
           "hover:border-primary/30",
         )}
       >
+        <BorderBeam
+          size={80}
+          duration={8}
+          borderWidth={1.5}
+          colorFrom="#172069ff"
+          colorTo="#bdbdbdff"
+        />
         <div className="p-5 space-y-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border">
             {entry.type === "session" ? (
