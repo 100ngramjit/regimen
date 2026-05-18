@@ -38,6 +38,7 @@ export default function ExportMenu({ plan }: ExportMenuProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {

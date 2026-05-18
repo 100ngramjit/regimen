@@ -16,6 +16,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     return (
       <Comp
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ref={ref as any}
         disabled={disabled || loading}
         aria-disabled={loading ? "true" : undefined}

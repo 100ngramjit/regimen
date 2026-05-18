@@ -8,6 +8,7 @@ import { withAuth } from '@workos-inc/authkit-nextjs';
 import { db } from '@/lib/db';
 import { workouts } from '@/lib/db/schema';
 import { eq, and, gte } from 'drizzle-orm';
+import { DAILY_WORKOUT_SYSTEM_PROMPT, getDailyWorkoutUserPrompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   const { user } = await withAuth();
@@ -39,39 +40,27 @@ export async function POST(req: NextRequest) {
 
   const ip = req.headers.get('x-forwarded-for') ?? 'local';
   if (!rateLimit(ip, 10, 60_000)) {
-    // Serve fallback silently instead of 429 — user still gets a workout
-    try {
-      const body = await req.json();
-      const data = WorkoutRequestSchema.parse(body);
-      const fallback = generateFallbackWorkout(data);
-      
-      await db.insert(workouts).values({
-        id: crypto.randomUUID(),
-        userId: user.id,
-        content: JSON.stringify(fallback),
-      });
-
-      return NextResponse.json(fallback);
-    } catch {
-      const fallback = generateFallbackWorkout({});
-      
-      await db.insert(workouts).values({
-        id: crypto.randomUUID(),
-        userId: user.id,
-        content: JSON.stringify(fallback),
-      });
-
-      return NextResponse.json(fallback);
-    }
+    return NextResponse.json({ 
+      error: 'Rate limit exceeded', 
+      message: 'Too many requests. Please try again in a minute.' 
+    }, { status: 429 });
   }
+
   let validatedData;
   try {
     const body = await req.json();
     validatedData = WorkoutRequestSchema.parse(body);
+  } catch (err) {
+    return NextResponse.json({ 
+      error: 'Invalid request', 
+      message: err instanceof Error ? err.message : 'Invalid request payload.' 
+    }, { status: 400 });
+  }
 
+  try {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey || apiKey.includes('your_ai_api_key_here')) {
-      console.warn('Gemini API key not found, using fallback.');
+      console.warn('Gemini API key not found. Using fallback workout.');
       const fallback = generateFallbackWorkout(validatedData);
       
       await db.insert(workouts).values({
@@ -91,52 +80,8 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const systemPrompt = `You are a certified fitness coach.
-Generate a professional workout plan based on the user input.
-
-Constraints:
-- Return ONLY valid JSON.
-- No explanations or text outside the JSON.
-- Keep total duration within the requested limit.
-- Include Warm-up, Main Workout, and Cool-down sections.
-- Ensure exercises are appropriate for the user's level and equipment.
-- Each exercise must have detailed instructions following this format:
-  "Setup: How to set up for the exercise. Execution: How to perform the movement. Breathing: When to inhale and exhale. Tip: One key coaching cue."
-
-Schema:
-{
-  "title": "Workout Title",
-  "totalTime": "Duration in mins",
-  "sections": [
-    {
-      "name": "Warm-up",
-      "exercises": [
-        {
-          "name": "Exercise Name",
-          "sets": "e.g. 3",
-          "duration": "e.g. 30s",
-          "reps": "e.g. 10",
-          "rest": "e.g. 15s",
-          "instructions": "Setup: ... Execution: ... Breathing: ... Tip: ..."
-        }
-      ]
-    }
-  ]
-}`;
-
-    const focusText = validatedData.focus && validatedData.focus.length > 0
-      ? validatedData.focus.join(', ')
-      : 'Full Body';
-
-    const userPrompt = `Generate a workout with these details:
-         Goal: ${validatedData.goal || 'General fitness'}
-         Muscle Focus: ${focusText}
-         Duration: ${validatedData.duration || 30} mins
-         Equipment: ${validatedData.equipment || 'None'}
-         Level: ${validatedData.level || 'Beginner'}
-         Additional Notes: ${validatedData.notes || 'None'}
-
-IMPORTANT: The workout MUST be centered around the ${focusText} muscle groups. Select exercises that primarily target these muscle groups.`;
+    const systemPrompt = DAILY_WORKOUT_SYSTEM_PROMPT;
+    const userPrompt = getDailyWorkoutUserPrompt(validatedData);
 
     const startTime = Date.now();
     const result = await model.generateContent([systemPrompt, userPrompt]);
@@ -154,39 +99,21 @@ IMPORTANT: The workout MUST be centered around the ${focusText} muscle groups. S
       content = content.replace(/```json|```/g, '').trim();
     }
 
-    try {
-      const aiResponse = JSON.parse(content);
-      const validatedWorkout = WorkoutSchema.parse(aiResponse);
+    const aiResponse = JSON.parse(content);
+    const validatedWorkout = WorkoutSchema.parse(aiResponse);
 
-      // Save to DB
-      await db.insert(workouts).values({
-        id: crypto.randomUUID(),
-        userId: user.id,
-        content: JSON.stringify(validatedWorkout),
-      });
+    // Save to DB
+    await db.insert(workouts).values({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      content: JSON.stringify(validatedWorkout),
+    });
 
-      return NextResponse.json(validatedWorkout);
-    } catch (parseError) {
-      console.warn('AI parse/validation error, using fallback:', parseError);
-      const fallback = generateFallbackWorkout(validatedData);
-      
-      // Save fallback to DB as well so it counts towards the limit
-      await db.insert(workouts).values({
-        id: crypto.randomUUID(),
-        userId: user.id,
-        content: JSON.stringify(fallback),
-      });
-
-      return NextResponse.json(fallback);
-    }
+    return NextResponse.json(validatedWorkout);
   } catch (error) {
-    console.error('API Error:', error);
-    if (validatedData) {
+    console.warn('Gemini API or validation failed. Falling back to rule engine.', error);
+    try {
       const fallback = generateFallbackWorkout(validatedData);
-      
-      // Even on major error, if we serve a workout, we count it? 
-      // Actually, if it's an "unexpected error" we might not want to count it if it's a 500.
-      // But generateFallbackWorkout usually works.
       
       await db.insert(workouts).values({
         id: crypto.randomUUID(),
@@ -195,7 +122,12 @@ IMPORTANT: The workout MUST be centered around the ${focusText} muscle groups. S
       });
 
       return NextResponse.json(fallback);
+    } catch (fallbackError) {
+      console.error('Fallback generation also failed:', fallbackError);
+      return NextResponse.json({ 
+        error: 'Failed to generate workout', 
+        message: 'Both AI generation and fallback generation failed.' 
+      }, { status: 500 });
     }
-    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
 }
