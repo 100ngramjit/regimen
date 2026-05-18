@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FitnessLevel, WorkoutRequest } from "@/lib/schemas";
+import { FitnessLevel, MUSCLE_FOCUS_OPTIONS, MuscleFocus, WorkoutRequest } from "@/lib/schemas";
 import {
   Dumbbell,
   Clock,
@@ -9,9 +9,9 @@ import {
   MessageSquareText,
   Zap,
   ArrowRight,
+  Focus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MultiSelectCombobox } from "@/components/ui/multi-select-combobox";
 import { cn } from "@/lib/utils";
 import { useDbState } from "@/lib/use-db-state";
 
@@ -31,6 +32,7 @@ interface Props {
 
 const DEFAULT: WorkoutRequest = {
   goal: "muscle gain",
+  focus: [],
   duration: 30,
   equipment: "full gym",
   level: "intermediate",
@@ -89,6 +91,21 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
 
         <div className="space-y-2.5">
           <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+            <Focus size={13} className="text-primary" /> Muscle Focus
+          </Label>
+          <MultiSelectCombobox
+            options={MUSCLE_FOCUS_OPTIONS.map((f) => ({ value: f, label: f }))}
+            value={formData.focus ?? []}
+            onChange={(v) => update("focus", v as MuscleFocus[])}
+            placeholder="Select muscle groups..."
+            emptyText="No muscle groups found."
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2.5">
+          <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
             <Dumbbell size={13} className="text-primary" /> Equipment
           </Label>
           <Select
@@ -107,61 +124,59 @@ export default function WorkoutForm({ onGenerate, isLoading }: Props) {
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2.5">
+          <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+            <Clock size={13} className="text-primary" /> Duration
+          </Label>
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min={5}
+              max={120}
+              step={5}
+              value={formData.duration}
+              onChange={(e) => update("duration", parseInt(e.target.value))}
+              className="flex-1 h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary
+                [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-primary/30
+                [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background
+                [&::-webkit-slider-thumb]:cursor-pointer"
+            />
+            <div className="flex items-center gap-1 min-w-[72px] justify-end">
+              <span className="text-2xl font-bold tabular-nums text-foreground">
+                {formData.duration}
+              </span>
+              <span className="text-xs font-medium text-muted-foreground">min</span>
+            </div>
+          </div>
+          <div className="flex justify-between text-[11px] text-muted-foreground/60 px-0.5">
+            <span>5</span>
+            <span>120</span>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2.5">
         <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-          <Clock size={13} className="text-primary" /> Duration
-        </Label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min={5}
-            max={120}
-            step={5}
-            value={formData.duration}
-            onChange={(e) => update("duration", parseInt(e.target.value))}
-            className="flex-1 h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5
-              [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary
-              [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-primary/30
-              [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background
-              [&::-webkit-slider-thumb]:cursor-pointer"
-          />
-          <div className="flex items-center gap-1 min-w-[72px] justify-end">
-            <span className="text-2xl font-bold tabular-nums text-foreground">
-              {formData.duration}
-            </span>
-            <span className="text-xs font-medium text-muted-foreground">min</span>
-          </div>
-        </div>
-        <div className="flex justify-between text-[11px] text-muted-foreground/60 px-0.5">
-          <span>5</span>
-          <span>120</span>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
           <Zap size={13} className="text-primary" /> Level
         </Label>
-        <div className="grid grid-cols-3 gap-2">
-          {LEVELS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => update("level", value)}
-              className={cn(
-                "relative rounded-2xl border px-3 py-3 text-center text-sm font-medium transition-all glass-light",
-                formData.level === value
-                  ? "border-primary bg-primary/15 text-primary shadow-md"
-                  : "hover:glass-hover",
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <Select
+          value={formData.level}
+          onValueChange={(v) => v && update("level", v as FitnessLevel)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select fitness level" />
+          </SelectTrigger>
+          <SelectContent>
+            {LEVELS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2.5">

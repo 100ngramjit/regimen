@@ -122,12 +122,19 @@ Schema:
   ]
 }`;
 
+    const focusText = validatedData.focus && validatedData.focus.length > 0
+      ? validatedData.focus.join(', ')
+      : 'Full Body';
+
     const userPrompt = `Generate a workout with these details:
          Goal: ${validatedData.goal || 'General fitness'}
+         Muscle Focus: ${focusText}
          Duration: ${validatedData.duration || 30} mins
          Equipment: ${validatedData.equipment || 'None'}
          Level: ${validatedData.level || 'Beginner'}
-         Additional Notes: ${validatedData.notes || 'None'}`;
+         Additional Notes: ${validatedData.notes || 'None'}
+
+IMPORTANT: The workout MUST be centered around the ${focusText} muscle groups. Select exercises that primarily target these muscle groups.`;
 
     const startTime = Date.now();
     const result = await model.generateContent([systemPrompt, userPrompt]);

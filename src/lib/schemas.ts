@@ -1,7 +1,23 @@
 import { z } from "zod";
 
+export const MUSCLE_FOCUS_OPTIONS = [
+  "Chest",
+  "Back",
+  "Shoulders",
+  "Biceps",
+  "Triceps",
+  "Legs",
+  "Glutes",
+  "Core",
+  "Calves",
+  "Forearms",
+] as const;
+
+export type MuscleFocus = (typeof MUSCLE_FOCUS_OPTIONS)[number];
+
 export const WorkoutRequestSchema = z.object({
   goal: z.string().optional(),
+  focus: z.array(z.enum(MUSCLE_FOCUS_OPTIONS)).optional(),
   duration: z.number().min(5).max(120).optional(),
   equipment: z.string().optional(),
   level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
@@ -49,6 +65,13 @@ export const DAY_FOCUS_OPTIONS = [
   "Chest",
   "Shoulders",
   "Glutes",
+  "Chest & Triceps",
+  "Back & Biceps",
+  "Shoulders & Abs",
+  "Chest & Shoulders",
+  "Legs & Core",
+  "Back & Rear Delts",
+  "Arms & Core",
 ] as const;
 
 export type DayFocus = (typeof DAY_FOCUS_OPTIONS)[number];

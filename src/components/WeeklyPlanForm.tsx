@@ -262,23 +262,18 @@ export default function WeeklyPlanForm({ onGenerate, isLoading }: Props) {
           <Label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
             <Activity size={13} className="text-primary" /> Level
           </Label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {LEVELS.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setLevel(value)}
-                className={cn(
-                  "rounded-xl border px-2 py-2 text-xs font-medium text-center transition-all cursor-pointer glass-light",
-                  level === value
-                    ? "border-primary bg-primary/15 text-primary shadow-md"
-                    : "hover:glass-hover",
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <Select value={level} onValueChange={(v) => v && setLevel(v as FitnessLevel)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select level" />
+            </SelectTrigger>
+            <SelectContent>
+              {LEVELS.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
