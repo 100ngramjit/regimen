@@ -98,7 +98,7 @@ function SessionDetail({ workout }: { workout: Workout }) {
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-border/20" />
             <h3 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50 px-2">
-              {section.name}
+              {section.name} · {section.exercises.length} {section.exercises.length === 1 ? "Workout" : "Workouts"}
             </h3>
             <div className="h-px flex-1 bg-border/20" />
           </div>
@@ -107,13 +107,13 @@ function SessionDetail({ workout }: { workout: Workout }) {
             {section.exercises.map((ex, ei) => (
               <div
                 key={ei}
-                className="flex items-start justify-between gap-4 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-4 transition-all hover:border-primary/20 hover:bg-card/60"
+                className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-4 transition-all hover:border-primary/20 hover:bg-card/60 max-w-full"
               >
-                <div className="flex items-start gap-3 min-w-0">
+                <div className="flex items-start gap-3 min-w-0 w-full sm:w-auto">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary border border-primary/20">
                     {ei + 1}
                   </span>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground">
                       {ex.name}
                     </p>
@@ -122,8 +122,8 @@ function SessionDetail({ workout }: { workout: Workout }) {
                     )}
                   </div>
                 </div>
-                <div className="flex shrink-0 flex-col items-end gap-1.5">
-                  <div className="flex items-center gap-1.5">
+                <div className="flex shrink-0 flex-col items-end gap-1.5 w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center gap-1.5 justify-end">
                     {ex.sets && (
                       <span className="inline-flex items-center gap-1 rounded-md bg-foreground/10 px-2 py-0.5 text-[10px] font-semibold text-foreground">
                         <Repeat size={10} className="opacity-70" />
@@ -248,19 +248,19 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
             {selectedDay.workout.sections.map((section, si) => (
               <div key={si} className="space-y-2">
                 <h4 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/40">
-                  {section.name}
+                  {section.name} · {section.exercises.length} {section.exercises.length === 1 ? "Workout" : "Workouts"}
                 </h4>
                 <div className="space-y-1.5">
                   {section.exercises.map((ex, ei) => (
                     <div
                       key={ei}
-                      className="flex items-start justify-between gap-3 rounded-lg border border-border/30 bg-card/40 backdrop-blur-sm px-4 py-3"
+                      className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 rounded-lg border border-border/30 bg-card/40 backdrop-blur-sm px-4 py-3 max-w-full"
                     >
-                      <div className="flex items-start gap-3 min-w-0">
+                      <div className="flex items-start gap-3 min-w-0 w-full sm:w-auto">
                         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary border border-primary/20">
                           {ei + 1}
                         </span>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-foreground">
                             {ex.name}
                           </p>
@@ -269,8 +269,8 @@ function WeeklyDetail({ plan }: { plan: WeeklyPlan }) {
                           )}
                         </div>
                       </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
-                        <div className="flex items-center gap-1.5">
+                      <div className="flex shrink-0 flex-col items-end gap-1.5 w-full sm:w-auto mt-1 sm:mt-0">
+                        <div className="flex flex-wrap items-center gap-1.5 justify-end">
                           {ex.sets && (
                             <span className="inline-flex items-center gap-1 rounded-md bg-foreground/10 px-2 py-0.5 text-[10px] font-semibold text-foreground">
                               <Repeat size={10} className="opacity-70" />

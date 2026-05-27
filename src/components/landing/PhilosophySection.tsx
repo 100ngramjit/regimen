@@ -41,7 +41,7 @@ export default function PhilosophySection() {
         </motion.p>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 mt-16"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 0.9, duration: 0.8 }}
@@ -53,14 +53,17 @@ export default function PhilosophySection() {
           ].map((item, i) => (
             <motion.div
               key={item.number}
-              className="text-center"
+              className="px-6 py-8 clay-card text-center flex flex-col items-center justify-center cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ delay: 1 + i * 0.15, duration: 0.6 }}
+              whileHover={{ y: -6, scale: 1.03 }}
             >
-              <span className="text-primary/50 font-serif text-lg block mb-3">{item.number}</span>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.25em] text-foreground/80 mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground/70 font-light">{item.desc}</p>
+              <div className="w-10 h-10 rounded-full clay-icon flex items-center justify-center mb-4 select-none pointer-events-none">
+                <span className="text-primary font-black font-serif text-xs leading-none">{item.number}</span>
+              </div>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground mb-2">{item.title}</h3>
+              <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}
         </motion.div>

@@ -40,14 +40,18 @@ export default function CTAClimax({ isAuthenticated }: { isAuthenticated: boolea
         />
       </motion.div>
 
-      <div className="max-w-3xl mx-auto text-center relative z-10">
+      <div className="max-w-4xl mx-auto text-center relative z-10 px-4">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.8 }}
+          className="clay-card-primary px-8 py-16 sm:py-24 text-center relative overflow-hidden"
         >
+          {/* Subtle inside highlights / overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-black/10 pointer-events-none" />
+
           <motion.span
-            className="deco-label mb-6 block"
+            className="deco-label mb-6 block relative z-10"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ delay: 0.3 }}
@@ -56,7 +60,7 @@ export default function CTAClimax({ isAuthenticated }: { isAuthenticated: boolea
           </motion.span>
 
           <motion.h2
-            className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[0.95] mb-6 text-foreground"
+            className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[0.95] mb-6 text-foreground relative z-10"
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ delay: 0.4, duration: 0.7 }}
@@ -67,7 +71,7 @@ export default function CTAClimax({ isAuthenticated }: { isAuthenticated: boolea
           </motion.h2>
 
           <motion.p
-            className="text-base sm:text-lg text-muted-foreground max-w-lg mx-auto mb-10 leading-relaxed"
+            className="text-base sm:text-lg text-muted-foreground/80 max-w-lg mx-auto mb-10 leading-relaxed font-light relative z-10"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ delay: 0.7 }}
@@ -80,29 +84,21 @@ export default function CTAClimax({ isAuthenticated }: { isAuthenticated: boolea
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ delay: 0.9 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10"
           >
             <Link href={isAuthenticated ? "/weekly" : "/api/auth/signup"}>
               <motion.button
-                whileHover={{
-                  scale: 1.06,
-                  boxShadow: "0 0 60px color-mix(in srgb, var(--primary) 40%, transparent), 0 0 120px color-mix(in srgb, var(--primary) 20%, transparent)",
-                }}
-                whileTap={{ scale: 0.97 }}
-                className="relative cursor-pointer px-10 py-5 bg-primary text-background font-black text-sm uppercase tracking-[0.3em] rounded-xl overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                className="px-12 py-5 clay-btn-primary cursor-pointer"
               >
-                <span className="relative z-10">Get Started</span>
-                <motion.div
-                  className="absolute inset-0 bg-secondary"
-                  style={{ opacity: 0 }}
-                  whileHover={{ opacity: 0.2 }}
-                />
+                Get Started
               </motion.button>
             </Link>
           </motion.div>
 
           <motion.p
-            className="mt-6 text-[10px] text-muted-foreground/50 font-medium tracking-wide"
+            className="mt-6 text-[10px] text-muted-foreground/50 font-medium tracking-wide relative z-10"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ delay: 1.2 }}

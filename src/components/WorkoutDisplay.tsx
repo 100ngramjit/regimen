@@ -107,7 +107,7 @@ export default function WorkoutDisplay({ workout, onRegenerate }: Props) {
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-border/30" />
               <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/50 px-3">
-                {section.name}
+                {section.name} · {section.exercises.length} {section.exercises.length === 1 ? "Workout" : "Workouts"}
               </h3>
               <div className="h-px flex-1 bg-border/30" />
             </div>

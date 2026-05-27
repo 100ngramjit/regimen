@@ -55,9 +55,9 @@ export default function HowItWorks() {
         </motion.div>
 
         <div className="relative">
-          <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-px bg-border/20">
+          <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-1 bg-card/60 rounded-full shadow-[inset_1px_1px_2px_rgba(0,0,0,0.5),1px_1px_1px_rgba(255,255,255,0.05)]">
             <motion.div
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-primary via-primary/70 to-primary/40"
+              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-primary via-primary/80 to-primary/30 rounded-full shadow-[0_0_10px_rgba(172,189,186,0.6)]"
               style={{ height: lineHeight }}
             />
           </div>
@@ -84,31 +84,21 @@ function Step({ step, index }: { step: (typeof steps)[number]; index: number }) 
       className="relative flex gap-6 sm:gap-10 mb-16 last:mb-0"
     >
       <motion.div
-        className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shrink-0"
-        style={{
-          background: `color-mix(in srgb, var(--primary) 15%, transparent)`,
-          border: `2px solid color-mix(in srgb, var(--primary) 40%, transparent)`,
-        }}
+        className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 clay-sphere flex items-center justify-center shrink-0 cursor-pointer select-none"
         whileInView={{ scale: [0.8, 1] }}
         viewport={{ once: true }}
         transition={{ delay: index * 0.15 + 0.2, type: "spring", stiffness: 200 }}
       >
-        <span className="text-xs sm:text-sm font-black text-primary">
+        <span className="text-xs sm:text-sm font-black text-background">
           {step.number}
         </span>
-        <motion.div
-          className="absolute inset-0 rounded-full"
-          style={{ boxShadow: `0 0 20px color-mix(in srgb, var(--primary) 40%, transparent)` }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 3, repeat: Infinity, delay: index * 0.5 }}
-        />
       </motion.div>
 
       <div className="pt-2 sm:pt-3">
         <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-2 text-foreground">
           {step.title}
         </h3>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
+        <p className="text-sm sm:text-base text-muted-foreground/80 leading-relaxed max-w-lg font-light">
           {step.description}
         </p>
       </div>

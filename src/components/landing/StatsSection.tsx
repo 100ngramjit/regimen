@@ -74,24 +74,25 @@ export default function StatsSection() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="text-center"
+              className="px-4 py-8 clay-card text-center flex flex-col items-center justify-center cursor-pointer"
+              whileHover={{ y: -5, scale: 1.03 }}
             >
               <motion.div
-                className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-2 text-primary"
+                className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-2 text-primary drop-shadow-[0_2px_8px_rgba(172,189,186,0.25)] select-none pointer-events-none"
                 initial={{ scale: 0.8 }}
                 animate={isInView ? { scale: 1 } : { scale: 0.8 }}
                 transition={{ delay: i * 0.1 + 0.2, type: "spring", stiffness: 200 }}
               >
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} isInView={isInView} />
               </motion.div>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium tracking-wide">
+              <p className="text-[10px] sm:text-xs text-muted-foreground/80 font-black uppercase tracking-wider select-none pointer-events-none">
                 {stat.label}
               </p>
             </motion.div>

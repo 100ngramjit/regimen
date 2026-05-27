@@ -69,7 +69,7 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[number]; i
       style={{ perspective: "1000px" }}
     >
       <motion.div
-        className="relative p-6 rounded-2xl border border-border/20 bg-card/50 backdrop-blur-sm overflow-hidden h-full"
+        className="relative p-7 clay-card overflow-hidden h-full cursor-pointer"
         style={{
           rotateX: useTransform(smoothY, [-0.5, 0.5], [5, -5]),
           rotateY: useTransform(smoothX, [-0.5, 0.5], [-5, 5]),
@@ -78,39 +78,36 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[number]; i
         <motion.div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 70%)`,
+            background: `radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%)`,
           }}
         />
 
         <div className="relative z-10">
           <motion.div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{
-              background: `color-mix(in srgb, var(--primary) 15%, transparent)`,
-              border: `1px solid color-mix(in srgb, var(--primary) 30%, transparent)`,
-            }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            className="w-14 h-14 clay-icon flex items-center justify-center mb-5"
+            whileHover={{ scale: 1.12 }}
+            transition={{ type: "spring", stiffness: 400, damping: 12 }}
           >
-            <feature.icon size={22} className="text-primary" />
+            <feature.icon size={24} className="text-primary" />
           </motion.div>
 
-          <h3 className="text-sm font-black uppercase tracking-[0.15em] mb-2 text-foreground">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-2.5 text-foreground">
             {feature.title}
           </h3>
 
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground/80 leading-relaxed font-light">
             {feature.description}
           </p>
         </div>
 
         <motion.div
-          className="absolute bottom-0 left-0 right-0 h-px"
+          className="absolute bottom-0 left-0 right-0 h-[3px]"
           style={{
             background: `linear-gradient(90deg, transparent, var(--primary), transparent)`,
             opacity: 0,
+            filter: "blur(1px)",
           }}
-          whileHover={{ opacity: 1 }}
+          whileHover={{ opacity: 0.8 }}
           transition={{ duration: 0.3 }}
         />
       </motion.div>

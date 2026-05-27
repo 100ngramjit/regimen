@@ -303,6 +303,216 @@
   .ornament-line::after {
     background: linear-gradient(to left, transparent, color-mix(in srgb, var(--primary) 30%, transparent));
   }
+
+  /* Claymorphic Card */
+  .clay-card {
+    background: rgba(28, 33, 41, 0.55);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2rem;
+    box-shadow:
+      /* Soft floating shadow */
+      0 20px 40px -10px rgba(0, 0, 0, 0.5),
+      0 8px 16px -8px rgba(0, 0, 0, 0.4),
+      /* Inner top-left light highlight */
+      inset 1px 1px 1px rgba(255, 255, 255, 0.12),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.06),
+      /* Inner bottom-right dark shadow */
+      inset -4px -4px 12px rgba(0, 0, 0, 0.45);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-card:hover {
+    background: rgba(32, 38, 47, 0.7);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      /* Deeper float shadow */
+      0 28px 48px -12px rgba(0, 0, 0, 0.6),
+      0 12px 24px -10px rgba(0, 0, 0, 0.45),
+      /* Inner highlights get brighter */
+      inset 1px 1px 2px rgba(255, 255, 255, 0.18),
+      inset 2px 2px 8px rgba(255, 255, 255, 0.09),
+      inset -5px -5px 14px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Claymorphic Primary Card */
+  .clay-card-primary {
+    background: rgba(172, 189, 186, 0.07);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(172, 189, 186, 0.18);
+    border-radius: 2rem;
+    box-shadow:
+      0 20px 40px -10px rgba(0, 0, 0, 0.55),
+      0 8px 16px -8px rgba(172, 189, 186, 0.12),
+      /* Inner top-left highlight using primary color */
+      inset 1px 1px 2px rgba(255, 255, 255, 0.18),
+      inset 3px 3px 8px rgba(172, 189, 186, 0.1),
+      /* Inner bottom-right shadow */
+      inset -5px -5px 12px rgba(0, 0, 0, 0.6);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-card-primary:hover {
+    background: rgba(172, 189, 186, 0.11);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      0 28px 48px -12px rgba(0, 0, 0, 0.65),
+      0 12px 24px -10px rgba(172, 189, 186, 0.18),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.25),
+      inset 3px 3px 10px rgba(172, 189, 186, 0.15),
+      inset -6px -6px 14px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Claymorphic Primary Button */
+  .clay-btn-primary {
+    background: var(--primary);
+    color: var(--background);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+    border: none;
+    box-shadow:
+      /* Floating shadow */
+      0 12px 24px -6px rgba(172, 189, 186, 0.45),
+      0 4px 10px -4px rgba(172, 189, 186, 0.3),
+      /* Top-left inner highlight */
+      inset 2px 2px 4px rgba(255, 255, 255, 0.6),
+      inset 4px 4px 12px rgba(255, 255, 255, 0.35),
+      /* Bottom-right inner shadow */
+      inset -4px -4px 8px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+  }
+
+  .clay-btn-primary:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+      0 16px 28px -4px rgba(172, 189, 186, 0.55),
+      0 6px 14px -3px rgba(172, 189, 186, 0.35),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.75),
+      inset 4px 4px 12px rgba(255, 255, 255, 0.45),
+      inset -5px -5px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .clay-btn-primary:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow:
+      0 4px 12px -4px rgba(172, 189, 186, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.5),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.2),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Claymorphic Secondary Button */
+  .clay-btn-secondary {
+    background: rgba(28, 33, 41, 0.8);
+    color: var(--foreground);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 8px 16px -4px rgba(0, 0, 0, 0.4),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.15),
+      inset 3px 3px 8px rgba(255, 255, 255, 0.08),
+      inset -3px -3px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+  }
+
+  .clay-btn-secondary:hover {
+    background: rgba(34, 40, 50, 0.95);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+      0 12px 20px -3px rgba(0, 0, 0, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.2),
+      inset 3px 3px 8px rgba(255, 255, 255, 0.1),
+      inset -4px -4px 8px rgba(0, 0, 0, 0.45);
+  }
+
+  .clay-btn-secondary:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow:
+      0 3px 8px -2px rgba(0, 0, 0, 0.4),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.1),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Claymorphic Badge */
+  .clay-badge {
+    background: rgba(28, 33, 41, 0.85);
+    border: 1.5px solid rgba(172, 189, 186, 0.22);
+    border-radius: 9999px;
+    box-shadow:
+      0 6px 12px -4px rgba(0, 0, 0, 0.3),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.12),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.05),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .clay-badge:hover {
+    border-color: rgba(172, 189, 186, 0.4);
+    transform: translateY(-1px);
+    box-shadow:
+      0 8px 16px -3px rgba(0, 0, 0, 0.4),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.18),
+      inset -3px -3px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Claymorphic Icon container */
+  .clay-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: rgba(172, 189, 186, 0.07);
+    border: 1px solid rgba(172, 189, 186, 0.15);
+    box-shadow:
+      /* Inward depth */
+      inset 2px 2px 5px rgba(0, 0, 0, 0.5),
+      inset -2px -2px 5px rgba(255, 255, 255, 0.08),
+      /* Soft outward shadow */
+      0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .clay-icon:hover {
+    transform: scale(1.08);
+    background: rgba(172, 189, 186, 0.11);
+    box-shadow:
+      inset 1px 1px 3px rgba(0, 0, 0, 0.4),
+      inset -1px -1px 3px rgba(255, 255, 255, 0.12),
+      0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Claymorphic Sphere */
+  .clay-sphere {
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 35%, var(--primary) 0%, rgba(132, 150, 147, 0.8) 50%, rgba(53, 62, 60, 0.95) 100%);
+    box-shadow:
+      0 12px 24px -6px rgba(172, 189, 186, 0.4),
+      0 4px 12px -4px rgba(0, 0, 0, 0.5),
+      inset 3px 3px 6px rgba(255, 255, 255, 0.45),
+      inset 6px 6px 14px rgba(255, 255, 255, 0.2),
+      inset -6px -6px 12px rgba(0, 0, 0, 0.7);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .clay-sphere:hover {
+    transform: scale(1.08);
+    box-shadow:
+      0 16px 28px -4px rgba(172, 189, 186, 0.55),
+      0 6px 14px -3px rgba(0, 0, 0, 0.6),
+      inset 4px 4px 8px rgba(255, 255, 255, 0.55),
+      inset 8px 8px 18px rgba(255, 255, 255, 0.25),
+      inset -7px -7px 14px rgba(0, 0, 0, 0.8);
+  }
 }
 
 /* Custom Scrollbar */

@@ -15,7 +15,7 @@ export default function UsageCard({ usage, isLoading }: UsageCardProps) {
       <div className="mb-2.5 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
           <Zap size={13} className="text-primary" />
-          Daily Allowance
+          Daily Generations
         </div>
         <span className="text-[8px] font-extrabold uppercase tracking-wider text-muted-foreground/40">
           Resets at midnight

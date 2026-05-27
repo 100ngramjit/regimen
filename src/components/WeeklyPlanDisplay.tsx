@@ -43,7 +43,7 @@ function ExerciseList({ day }: { day: DayWorkout }) {
       {day.workout.sections.map((section, si) => (
         <div key={si} className="space-y-3">
           <h4 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            {section.name}
+            {section.name} · {section.exercises.length} {section.exercises.length === 1 ? "Workout" : "Workouts"}
           </h4>
 
           <div className="space-y-2">

@@ -5,8 +5,6 @@ import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import Link from "next/link";
 import ShinyText from "@/components/ui/shiny-text";
 
-const words = ["ADAPTIVE", "PRECISION", "PORTABLE", "FAST", "PERSONALIZED"];
-
 export default function Hero({
   isAuthenticated,
 }: {
@@ -29,9 +27,10 @@ export default function Hero({
     <motion.section
       ref={containerRef}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-      style={{ y, opacity, scale }}
+      style={{ y, opacity, scale, position: "relative" }}
     >
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Sunburst background */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
         <motion.div
           className="relative w-[700px] h-[700px]"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -53,7 +52,46 @@ export default function Hero({
           <div className="absolute inset-0 rounded-full bg-gradient-to-b from-background/40 via-transparent to-background/80" />
         </motion.div>
       </div>
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+
+      {/* Floating Clay Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <motion.div
+          className="absolute w-40 h-40 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-primary/8 to-primary/3 filter blur-xs top-[18%] -left-[10%] md:left-[8%]"
+          style={{
+            boxShadow:
+              "0 20px 40px rgba(0, 0, 0, 0.4), inset 8px 8px 16px rgba(255, 255, 255, 0.05), inset -8px -8px 16px rgba(0, 0, 0, 0.5)",
+          }}
+          animate={{
+            x: [0, 30, -15, 0],
+            y: [0, -40, 20, 0],
+            scale: [1, 1.08, 0.94, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute w-52 h-52 md:w-80 md:h-80 rounded-full bg-gradient-to-tr from-primary/4 to-secondary/8 filter blur-xs bottom-[20%] -right-[15%] md:right-[5%]"
+          style={{
+            boxShadow:
+              "0 25px 50px rgba(0, 0, 0, 0.5), inset 12px 12px 24px rgba(255, 255, 255, 0.04), inset -12px -12px 24px rgba(0, 0, 0, 0.6)",
+          }}
+          animate={{
+            x: [0, -40, 25, 0],
+            y: [0, 35, -25, 0],
+            scale: [1, 0.92, 1.06, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto -mt-10 sm:-mt-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
@@ -96,7 +134,10 @@ export default function Hero({
               }}
               className="block"
             >
-              <ShinyText text="start training." className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[0.95] tracking-tight" />
+              <ShinyText
+                text="start training."
+                className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[0.95] tracking-tight"
+              />
             </motion.span>
           </h1>
         </motion.div>
@@ -112,29 +153,6 @@ export default function Hero({
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 1.6 }}
-          className="flex flex-wrap items-center justify-center gap-3 mb-12"
-        >
-          {words.map((word) => (
-            <motion.span
-              key={word}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={
-                isInView
-                  ? { opacity: 0.4, scale: 1 }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              transition={{ delay: 1.8 + word.charCodeAt(0) * 0.01 }}
-              className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-muted-foreground px-3 py-1.5 border border-border/30 rounded-full"
-            >
-              {word}
-            </motion.span>
-          ))}
-        </motion.div>
-
-        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 2.2, duration: 0.6 }}
@@ -144,27 +162,20 @@ export default function Hero({
             <motion.button
               whileHover={{
                 scale: 1.05,
-                boxShadow:
-                  "0 0 40px color-mix(in srgb, var(--primary) 40%, transparent)",
               }}
-              whileTap={{ scale: 0.98 }}
-              className="relative cursor-pointer px-8 py-4 bg-primary text-background font-black text-xs uppercase tracking-[0.25em] rounded-lg overflow-hidden group"
+              whileTap={{ scale: 0.96 }}
+              className="px-10 py-5 clay-btn-primary"
             >
-              <span className="relative z-10">Get Started</span>
-              <motion.div
-                className="absolute inset-0 bg-secondary"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 0.15 }}
-              />
+              Get Started
             </motion.button>
           </Link>
 
           {!isAuthenticated && (
             <Link href="/api/auth/login">
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="cursor-pointer px-8 py-4 border border-border/40 text-foreground/70 font-black text-xs uppercase tracking-[0.25em] rounded-lg hover:border-border/60 hover:text-foreground transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                className="px-10 py-5 clay-btn-secondary"
               >
                 Sign In
               </motion.button>
@@ -174,14 +185,14 @@ export default function Hero({
       </div>
 
       <motion.div
-        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"
+        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 3 }}
       />
 
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 2.8 }}
