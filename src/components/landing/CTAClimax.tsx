@@ -60,14 +60,14 @@ export default function CTAClimax({ isAuthenticated }: { isAuthenticated: boolea
           </motion.span>
 
           <motion.h2
-            className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[0.95] mb-6 text-foreground relative z-10"
+            className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.08] mb-6 text-foreground relative z-10"
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ delay: 0.4, duration: 0.7 }}
           >
             Stop searching,
             <br />
-            <ShinyText text="start training." className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[0.95]" />
+            <ShinyText text="start training." className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.08] py-2" />
           </motion.h2>
 
           <motion.p

@@ -24,7 +24,7 @@ export const AnimatedShinyText: FC<AnimatedShinyTextProps> = ({
         } as CSSProperties
       }
       className={cn(
-        "inline-block bg-clip-text text-transparent",
+        "inline-block bg-clip-text text-transparent py-1",
 
         // Multiple backgrounds: Shimmer (layer 0) and Base Gradient (layer 1)
         "bg-[linear-gradient(110deg,transparent,35%,rgba(255,255,255,1),50%,rgba(255,255,255,1),65%,transparent),linear-gradient(to_right,var(--muted-foreground),var(--primary))]",

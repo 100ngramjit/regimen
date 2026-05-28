@@ -130,7 +130,7 @@ export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
         </div>
       </div>
 
-      <div className="flex justify-start sm:justify-center overflow-x-auto gap-1.5 pb-2 -mx-2 px-2 scrollbar-hide sm:px-0 sm:mx-0 max-w-full">
+      <div className="flex justify-start sm:justify-center overflow-x-auto gap-3 pb-2 -mx-2 px-2 scrollbar-hide sm:px-0 sm:mx-0 max-w-full">
         {plan.days.map((d, idx) => {
           const isActive = !d.isRest;
           const isExpanded = expandedIndex === idx;
@@ -138,7 +138,7 @@ export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
             <ExpandableScreen
               key={d.day}
               layoutId={`day-${d.day}`}
-              triggerRadius="8px"
+              triggerRadius="10px"
               contentRadius="20px"
               expanded={isExpanded}
               onExpandChange={(expanded) => handleExpandChange(idx, expanded)}
@@ -146,7 +146,7 @@ export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
               <ExpandableScreenTrigger>
                 <button
                   className={cn(
-                    "group relative overflow-hidden flex flex-col items-center gap-1 rounded-lg py-3 min-w-[3.5rem] transition-all cursor-pointer",
+                    "group relative overflow-hidden flex flex-col items-center gap-2 rounded-xl py-5 px-3 min-w-[5.5rem] transition-all cursor-pointer",
                     isExpanded
                       ? "bg-card/80 border border-primary shadow-sm"
                       : isActive
@@ -156,22 +156,22 @@ export default function WeeklyPlanDisplay({ plan, onRegenerate }: Props) {
                 >
                   {isActive && (
                     <BorderBeam
-                      size={40}
+                      size={50}
                       duration={6}
                       borderWidth={1}
                       colorFrom="#172069ff"
                       colorTo="#bdbdbdff"
                     />
                   )}
-                  <span className="relative z-10 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                  <span className="relative z-10 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
                     {d.day.slice(0, 3)}
                   </span>
                   {isActive ? (
-                    <span className="relative z-10 text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
-                      {d.focus.length > 6 ? d.focus.split(" ")[0] : d.focus}
+                    <span className="relative z-10 text-[11px] font-semibold text-muted-foreground/80 leading-tight text-center px-0.5">
+                      {d.focus.length > 8 ? d.focus.split(" ")[0] : d.focus}
                     </span>
                   ) : (
-                    <span className="relative z-10 text-[10px] font-medium text-muted-foreground/70 leading-tight text-center px-0.5">
+                    <span className="relative z-10 text-[11px] font-semibold text-muted-foreground/50 leading-tight text-center px-0.5">
                       Rest
                     </span>
                   )}

@@ -95,21 +95,10 @@ export default function Hero({
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 0.8, duration: 1.2 }}
-          className="mb-8"
-        >
-          <div className="ornament-line mb-8">
-            <div className="w-1.5 h-1.5 bg-primary/50 rotate-45" />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 1, duration: 1.2 }}
           className="mb-6"
         >
-          <h1 className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[0.95] tracking-tight">
+          <h1 className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[1.08] tracking-tight">
             <motion.span
               initial={{ y: 80, opacity: 0 }}
               animate={isInView ? { y: 0, opacity: 1 } : { y: 80, opacity: 0 }}
@@ -136,7 +125,7 @@ export default function Hero({
             >
               <ShinyText
                 text="start training."
-                className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[0.95] tracking-tight"
+                className="text-[clamp(2.5rem,8vw,6rem)] font-black leading-[1.08] tracking-tight py-2"
               />
             </motion.span>
           </h1>

@@ -11,14 +11,6 @@ export default function PhilosophySection() {
   return (
     <section ref={ref} className="relative py-28 sm:py-36 px-6">
       <div className="max-w-3xl mx-auto text-center">
-        <motion.div
-          className="ornament-line mb-12"
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={isInView ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
-          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          <div className="w-1.5 h-1.5 bg-primary/50 rotate-45" />
-        </motion.div>
 
         <motion.span
           className="deco-label mb-8 block"
@@ -68,14 +60,6 @@ export default function PhilosophySection() {
           ))}
         </motion.div>
 
-        <motion.div
-          className="ornament-line mt-16"
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={isInView ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
-          transition={{ delay: 1.5, duration: 1 }}
-        >
-          <div className="w-1.5 h-1.5 bg-primary/50 rotate-45" />
-        </motion.div>
       </div>
     </section>
   );

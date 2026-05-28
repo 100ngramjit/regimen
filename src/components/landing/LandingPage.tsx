@@ -37,9 +37,6 @@ export default function LandingPage({ isAuthenticated }: LandingPageProps) {
       </div>
 
       <footer className="relative z-10 border-t border-primary/10 py-10 text-center px-6">
-        <div className="ornament-line mb-6">
-          <div className="w-1 h-1 bg-primary/20 rotate-45" />
-        </div>
         <p className="text-[9px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/25">
           2026 Regimen — The Energy Architecture Atelier
         </p>
